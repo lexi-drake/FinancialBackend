@@ -12,16 +12,33 @@ namespace financial_backend.Controllers
     public class LedgerController : ControllerBase
     {
         private readonly ILogger<LedgerController> _logger;
+        private ILedgerService _service;
 
-        public LedgerController(ILogger<LedgerController> logger)
+        public LedgerController(ILogger<LedgerController> logger, ILedgerService service)
         {
             _logger = logger;
+            _service = service;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<LedgerEntry>> Get()
+        [Route("")]
+        public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries()
         {
-            return new OkObjectResult(null);
+            throw new NotImplementedException();
+        }
+
+        [HttpPost]
+        [Route("")]
+        public async Task<ActionResult<LedgerEntry>> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpGet]
+        [Route("categories")]
+        public async Task<ActionResult<IEnumerable<PurchaseCategory>>> GetPurchaseCategories()
+        {
+            throw new NotImplementedException();
         }
     }
 }
