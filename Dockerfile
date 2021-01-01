@@ -1,7 +1,7 @@
 # Nuget restore
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
-COPY *.sln
+COPY *.sln .
 COPY Tests/*.csproj Tests/
 COPY WebService/*.csproj WebService/
 RUN dotnet restore
