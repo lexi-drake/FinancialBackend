@@ -1,0 +1,6 @@
+**/.vscode
+**/.git
+**/.gitignore
+**/bin
+**/obj
+README.md
