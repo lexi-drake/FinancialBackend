@@ -17,7 +17,7 @@ RUN dotnet test
 # Publish
 FROM build AS publish
 WORKDIR /src/WebService
-RUN dotnet publish -c Release /src/publish
+RUN dotnet publish -c Release -o /src/publish
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
 WORKDIR /app
