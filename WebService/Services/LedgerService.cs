@@ -1,0 +1,121 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+
+namespace WebService
+{
+    public class LedgerService : ILedgerService
+    {
+        private ILogger<LedgerService> _logger;
+        private ILedgerRepository _repo;
+
+        public LedgerService(ILogger<LedgerService> logger, ILedgerRepository repo)
+        {
+            _logger = logger;
+            _repo = repo;
+        }
+
+        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId)
+        {
+            return await _repo.GetLedgerEntriesForUserAsync(userId);
+        }
+
+        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime startDate, DateTime endDate, string userId)
+        {
+            return from ledger in await _repo.GetLedgerEntriesForUserAsync(userId)
+                   where ledger.TransactionDate >= startDate && ledger.TransactionDate <= endDate
+                   select ledger;
+        }
+
+        public async Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntryRequest request, string userId)
+        {
+            var categoryIds = from category in await _repo.GetLedgerEntryCategoriesAsync()
+                              where category.Name.Equals(request.Category, StringComparison.InvariantCultureIgnoreCase)
+                              select category.Id;
+
+            string categoryId = null;
+            if (categoryIds.Any())
+            {
+                // If we already have this category in the database, use the existing id
+                categoryId = categoryIds.First();
+            }
+            else
+            {
+                // If we don't have this category in the database, insert a new category
+                // and use its id
+                var category = await _repo.InsertLedgerEntryCategoryAsync(new LedgerEntryCategory()
+                {
+                    Name = request.Category,
+                    CreatedDate = DateTime.Now
+                });
+                categoryId = category.Id;
+            }
+
+            return await _repo.InsertLedgerEntryAsync(new LedgerEntry()
+            {
+                UserId = userId,
+                CategoryId = categoryId,
+                Description = request.Description,
+                Amount = request.Amount,
+                TransactionTypeId = request.TransactionTypeId,
+                TransactionDate = request.TransactionDate,
+                CreatedDate = DateTime.Now
+            });
+        }
+
+        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesAsync()
+        {
+            return await _repo.GetLedgerEntryCategoriesAsync();
+        }
+
+        public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId)
+        {
+            return await _repo.GetIncomeGeneratorsByUserIdAsync(userId);
+        }
+
+        public async Task<IncomeGenerator> InsertIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId)
+        {
+            // Validation ensures non-duplicate income generator
+
+            // The transactions need to be inserted first, so that the is can be included
+            // in the income generator. Also, LINQ doesn't allow 'await' in the select 
+            // part of the query.
+            var transactionIds = new List<string>();
+            foreach (var transaction in request.RecurringTransactions)
+            {
+                transactionIds.Add((await InsertRecurringTransactionAsync(transaction, userId)).Id);
+            }
+
+            return await _repo.InsertIncomeGeneratorAsync(new IncomeGenerator()
+            {
+                UserId = userId,
+                Description = request.Description,
+                SalaryTypeId = request.SalaryTypeId,
+                FrequencyId = request.FrequencyId,
+                RecurringTransactions = transactionIds,
+                CreatedDate = DateTime.Now
+            });
+        }
+
+        public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
+        {
+            return await _repo.GetRecurringTransactionsByUserIdAsync(userId);
+        }
+
+        public async Task<RecurringTransaction> InsertRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
+        {
+            return await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
+            {
+                UserId = userId,
+                CategoryId = request.CategoryId,
+                Description = request.Description,
+                Amount = request.Amount,
+                FrequencyId = request.FrequencyId,
+                TransactionTypeId = request.TransactionTypeId,
+                CreatedDate = DateTime.Now
+            });
+        }
+    }
+}
