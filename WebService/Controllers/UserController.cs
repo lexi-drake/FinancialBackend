@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace WebService.Controllers
 {
     [ApiController]
-    [Route("api/ledger")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
