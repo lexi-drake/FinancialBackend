@@ -59,6 +59,13 @@ namespace WebService.Controllers
             return new OkResult();
         }
 
+        [HttpPost]
+        [Route("role")]
+        public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRole)
+        {
+            return new NotFoundResult();
+        }
+
         private void PrepareCookies(Token token)
         {
             // Delete existing cookies, useful for refreshing
