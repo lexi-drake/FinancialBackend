@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -36,13 +34,13 @@ namespace WebService
             });
             services.AddLogging();
 
-            services.AddScoped<JwtHelper>(s => new JwtHelper(""));
+            services.AddScoped<JwtHelper>(s => new JwtHelper("", "", ""));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILedgerRepository>(s =>
-                new LedgerRepository("", ""));
+                new LedgerRepository(Configuration["ConnectionStrings:MongoDB"], Configuration["ConnectionStrings:LedgerDB"]));
             services.AddScoped<IUserRepository>(s =>
-                new UserRepository("", ""));
+                new UserRepository(Configuration["ConnectionStrings:MongoDB"], Configuration["ConnectionStrings:UsersDB"]));
 
             services.AddMvc().AddFluentValidation();
             services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
@@ -51,7 +49,30 @@ namespace WebService
             services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
 
-            // TODO (alexa): setup for jwt authentication
+            services.AddAuthentication(configuratinOptions =>
+            {
+                configuratinOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Secret"])),
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidateLifetime = true
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["jwt"];
+                        return Task.CompletedTask;
+                    }
+                };
+            });
             services.AddControllers();
         }
 

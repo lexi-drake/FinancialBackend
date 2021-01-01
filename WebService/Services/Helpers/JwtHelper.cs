@@ -13,10 +13,14 @@ namespace WebService
         private const int REFRESH_TOKEN_SIZE = 32;
         private const string SECURITY_ALGORITHM = SecurityAlgorithms.HmacSha256Signature;
         private readonly string _secret;
+        private readonly string _issuer;
+        private readonly string _audience;
 
-        public JwtHelper(string secret)
+        public JwtHelper(string secret, string issuer, string audience)
         {
             _secret = secret;
+            _issuer = issuer;
+            _audience = audience;
         }
 
         public Token CreateToken(string userId, string roleId)
@@ -43,7 +47,7 @@ namespace WebService
 
             var expiration = DateTime.Now.AddMinutes(LOGIN_MINUTES);
             var credentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM);
-            var jwt = new JwtSecurityToken("lexi", "drake", claims, expires: expiration, signingCredentials: credentials);
+            var jwt = new JwtSecurityToken(_issuer, _audience, claims, expires: expiration, signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
