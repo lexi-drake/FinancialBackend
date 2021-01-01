@@ -34,7 +34,10 @@ namespace WebService
             });
             services.AddLogging();
 
-            services.AddScoped<JwtHelper>(s => new JwtHelper("", "", ""));
+            services.AddScoped<JwtHelper>(s => new JwtHelper(
+                Configuration["Jwt:Secret"],
+                Configuration["Jwt:Issuer"],
+                Configuration["Jwt:Audience"]));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILedgerRepository>(s =>
