@@ -46,7 +46,11 @@ namespace WebService
                 new UserRepository("", ""));
 
             services.AddMvc().AddFluentValidation();
-
+            services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+            services.AddTransient<IValidator<IncomeGeneratorRequest>, IncomeGeneratorRequestValidator>();
+            services.AddTransient<IValidator<LedgerEntryRequest>, LedgerEntryRequestValidator>();
+            services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
+            services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
 
             // TODO (alexa): setup for jwt authentication
             services.AddControllers();

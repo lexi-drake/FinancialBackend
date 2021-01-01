@@ -65,5 +65,24 @@ namespace WebService
         {
             throw new NotImplementedException();
         }
+        public async Task<IEnumerable<SalaryType>> GetSalaryTypesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<SalaryType> InsertSalaryTypeAsync(SalaryType type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Frequency>> GetFrequenciesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Frequency> InsertFrequencyAsync(Frequency frequency)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

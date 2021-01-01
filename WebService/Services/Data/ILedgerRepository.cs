@@ -16,5 +16,9 @@ namespace WebService
         Task<RecurringTransaction> InsertRecurringTransactionAsync(RecurringTransaction transaction);
         Task<IEnumerable<TransactionType>> GetTransactionTypesAsync();
         Task<TransactionType> InsertTransactionTypeAsync(TransactionType type);
+        Task<IEnumerable<SalaryType>> GetSalaryTypesAsync();
+        Task<SalaryType> InsertSalaryTypeAsync(SalaryType type);
+        Task<IEnumerable<Frequency>> GetFrequenciesAsync();
+        Task<Frequency> InsertFrequencyAsync(Frequency frequency);
     }
 }
