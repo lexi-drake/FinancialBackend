@@ -118,5 +118,10 @@ namespace WebService
                 throw;
             }
         }
+
+        public async Task<UserRole> AddUserRoleAsync(UserRole role)
+        {
+            return await _repo.InsertUserRoleAsync(role);
+        }
     }
 }

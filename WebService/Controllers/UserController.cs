@@ -61,9 +61,9 @@ namespace WebService.Controllers
 
         [HttpPost]
         [Route("role")]
-        public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRole)
+        public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRole request)
         {
-            return new NotFoundResult();
+            return new OkObjectResult(await _service.AddUserRoleAsync(request));
         }
 
         private void PrepareCookies(Token token)
