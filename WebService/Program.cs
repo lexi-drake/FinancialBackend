@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore;
+using System.IO;
 
 namespace WebService
 {
@@ -20,8 +17,17 @@ namespace WebService
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostContext, config) =>
                 {
-                    config.AddJsonFile("appsettings.json")
-                        .AddEnvironmentVariables();
+                    try
+                    {
+                        // We can load config from appsettings locally
+                        config.AddJsonFile("appsettings.json");
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        // When we deploy, we want to use environment variables insead
+                        // of appsettings.json
+                        config.AddEnvironmentVariables();
+                    }
                 }).UseStartup<Startup>();
     }
 }
