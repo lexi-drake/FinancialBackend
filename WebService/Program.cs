@@ -8,6 +8,8 @@ namespace WebService
 {
     public class Program
     {
+        private const string APPSETTINGS = "appsettings.json";
+
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -17,12 +19,12 @@ namespace WebService
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostContext, config) =>
                 {
-                    try
+                    if (File.Exists(APPSETTINGS))
                     {
                         // We can load config from appsettings locally
-                        config.AddJsonFile("appsettings.json");
+                        config.AddJsonFile(APPSETTINGS);
                     }
-                    catch (FileNotFoundException)
+                    else
                     {
                         // When we deploy, we want to use environment variables insead
                         // of appsettings.json
