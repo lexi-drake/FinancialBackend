@@ -12,7 +12,6 @@ namespace WebService
         Task<RefreshData> InsertRefreshDataAsync(RefreshData token);
         Task DeleteRefreshDataByIdAsync(string id);
         Task<IEnumerable<UserRole>> GetUserRolesAsync();
-        Task<IEnumerable<UserRole>> GetUserRolesByIdAsync();
         Task<UserRole> InsertUserRoleAsync(UserRole role);
     }
 }

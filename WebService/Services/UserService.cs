@@ -28,16 +28,10 @@ namespace WebService
             var salt = GenerateSalt();
             var passwordHash = BC.HashPassword(salt + request.Password);
 
-            var roles = from role in await _repo.GetUserRolesAsync()
-                        where role.Description.Equals(USER_ROLE, StringComparison.InvariantCultureIgnoreCase)
-                        select role;
-            if (!roles.Any())
-            {
-                return null;
-            }
-
+            // Validator ensures role is "User"
             await _repo.InsertUserAsync(new User()
             {
+                Role = USER_ROLE,
                 Username = request.Username,
                 PasswordHash = passwordHash,
                 Salt = salt,
@@ -71,7 +65,7 @@ namespace WebService
                 return null;
             }
 
-            var token = _jwt.CreateToken(user.Id, user.RoleId);
+            var token = _jwt.CreateToken(user.Id, user.Role);
             await _repo.InsertRefreshDataAsync(new RefreshData()
             {
                 Refresh = token.Refresh,
