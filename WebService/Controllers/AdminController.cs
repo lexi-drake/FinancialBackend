@@ -66,7 +66,6 @@ namespace WebService.Controllers
         public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRoleRequest request)
         {
             var userId = GetUserIdFromCookie();
-            _logger.LogDebug($"userid: {userId}");
             if (userId is null)
             {
                 return new UnauthorizedResult();
@@ -76,10 +75,8 @@ namespace WebService.Controllers
 
         private string GetUserIdFromCookie()
         {
-            _logger.LogInformation("getting userid from cookie");
             if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt))
             {
-                _logger.LogError("Unable to get userid from cookie");
                 return null;
             }
             return _jwt.GetUserIdFromToken(jwt);
