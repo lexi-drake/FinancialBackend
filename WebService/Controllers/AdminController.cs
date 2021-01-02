@@ -75,6 +75,7 @@ namespace WebService.Controllers
         {
             if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt))
             {
+                _logger.LogError("Unable to get userid from cookie");
                 return null;
             }
             return _jwt.GetUserIdFromToken(jwt);
