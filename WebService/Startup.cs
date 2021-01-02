@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -24,6 +23,8 @@ namespace WebService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Console.WriteLine($"Issuer: {Configuration["Jwt:Issuer"]}");
+            Console.WriteLine($"Audience: {Configuration["Jwt:Audience"]}");
             services.AddCors(options =>
             {
                 options.AddPolicy("allow",
