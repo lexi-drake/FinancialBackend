@@ -48,6 +48,8 @@ namespace WebService
                 audience));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAdminService, AdminService>();
+
             services.AddScoped<ILedgerRepository>(s =>
                 new LedgerRepository(Configuration["MONGO_DB"], Configuration["LEDGER_DB"]));
             services.AddScoped<IUserRepository>(s =>
@@ -58,6 +60,10 @@ namespace WebService
             services.AddTransient<IValidator<LedgerEntryRequest>, LedgerEntryRequestValidator>();
             services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
+            services.AddTransient<IValidator<FrequencyRequest>, FrequencyRequestValidator>();
+            services.AddTransient<IValidator<SalaryTypeRequest>, SalaryTypeRequestValidator>();
+            services.AddTransient<IValidator<TransactionTypeRequest>, TransactionTypeRequestValidator>();
+            services.AddTransient<IValidator<UserRoleRequest>, UserRoleRequestValidator>();
 
             services.AddAuthentication(options =>
             {
@@ -69,6 +75,10 @@ namespace WebService
                 {
                     OnMessageReceived = context =>
                     {
+                        foreach (var c in context.Request.Cookies)
+                        {
+                            Console.WriteLine($"{c.Key}: {c.Value}");
+                        }
                         Console.WriteLine($"Received cookie: {context.Request.Cookies["jwt"]}");
                         var token = context.Request.Cookies["jwt"].ExtractJwtFromCookie();
                         Console.WriteLine($"Token: {token}");
