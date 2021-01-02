@@ -99,11 +99,13 @@ namespace WebService
         {
             var parameters = new TokenValidationParameters()
             {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(_secret)),
                 ValidateIssuer = true,
+                ValidIssuer = _issuer,
                 ValidateAudience = true,
-                ValidateLifetime = false,
-                IssuerSigningKey = GetSecurityKey(),
-                ClockSkew = TimeSpan.Zero
+                ValidAudience = _audience,
+                ValidateLifetime = false
             };
             return new JwtSecurityTokenHandler().ValidateToken(jwt, parameters, out var securityToken);
         }

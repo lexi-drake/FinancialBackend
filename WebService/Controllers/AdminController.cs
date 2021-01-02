@@ -26,7 +26,7 @@ namespace WebService.Controllers
         public async Task<ActionResult<Frequency>> AddFrequency([FromBody] FrequencyRequest request)
         {
 
-            var userId = ExtractUserId();
+            var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
@@ -38,8 +38,7 @@ namespace WebService.Controllers
         [Route("salarytype")]
         public async Task<ActionResult<SalaryType>> AddSalaryType([FromBody] SalaryTypeRequest request)
         {
-
-            var userId = ExtractUserId();
+            var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
@@ -52,7 +51,7 @@ namespace WebService.Controllers
         public async Task<ActionResult<TransactionType>> AddTransactionType([FromBody] TransactionTypeRequest request)
         {
 
-            var userId = ExtractUserId();
+            var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
@@ -64,7 +63,7 @@ namespace WebService.Controllers
         [Route("role")]
         public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRoleRequest request)
         {
-            var userId = ExtractUserId();
+            var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
@@ -72,7 +71,7 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.AddUserRoleAsync(request, userId));
         }
 
-        private string ExtractUserId()
+        private string GetUserIdFromCookie()
         {
             if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt))
             {
