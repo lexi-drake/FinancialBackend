@@ -40,16 +40,20 @@ namespace WebService
                 return null;
             }
 
-            var claims = new Claim[]
+            var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                new Claim(ClaimTypes.Name, userid),
-                new Claim(ClaimTypes.Role, role)
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, userid),
+                    new Claim(ClaimTypes.Role, role)
+                }),
+                Expires = DateTime.Now.AddMinutes(LOGIN_MINUTES),
+                SigningCredentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM)
             };
 
-            var expiration = DateTime.Now.AddMinutes(LOGIN_MINUTES);
-            var credentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM);
-            var jwt = new JwtSecurityToken(_issuer, _audience, claims, expires: expiration, signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         private SymmetricSecurityKey GetSecurityKey()
