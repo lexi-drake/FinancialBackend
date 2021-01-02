@@ -57,18 +57,18 @@ namespace WebService
 
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
                 options.Events = new JwtBearerEvents()
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = $"Bearer {context.Request.Cookies["jwt"]}";
+                        context.Token = context.Request.Cookies["jwt"];
+                        Console.WriteLine($"Received token: {context.Token}");
                         return Task.CompletedTask;
                     }
-
                 };
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
@@ -81,6 +81,7 @@ namespace WebService
                     ValidateLifetime = true
                 };
             });
+            services.AddAuthorization();
 
             services.AddControllers();
         }
@@ -91,8 +92,9 @@ namespace WebService
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("allow");
-            app.UseAuthorization();
+
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
