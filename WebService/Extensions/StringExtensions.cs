@@ -6,6 +6,10 @@ namespace WebService
     {
         public static string ExtractJwtFromCookie(this string cookie)
         {
+            if (cookie is null)
+            {
+                return "";
+            }
             return cookie.Split(';').First().Trim();
         }
     }
