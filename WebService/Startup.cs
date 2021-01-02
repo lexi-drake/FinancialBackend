@@ -65,7 +65,10 @@ namespace WebService
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["jwt"].ExtractJwtFromCookie();
+                        Console.WriteLine($"Received cookie: {context.Request.Cookies["jwt"]}");
+                        var token = context.Request.Cookies["jwt"].ExtractJwtFromCookie();
+                        Console.WriteLine($"Token: {token}");
+                        context.Token = token;
                         Console.WriteLine($"Received token: {context.Token}");
                         return Task.CompletedTask;
                     }
