@@ -81,18 +81,26 @@ namespace WebService
 
         private Claim GetClaimByType(string jwt, string type)
         {
+            Console.WriteLine($"getting {type} from jwt");
             var principal = GetPrincipalFromExpiredToken(jwt);
             var ids = principal.Identities;
             var claims = from id in ids
                          from claim in id.Claims
                          where claim.Type == type
-                         select claim;
+                         select GetClaim(claim);
 
             if (claims.Any())
             {
+                Console.WriteLine("Error: no matching claims!");
                 return null;
             }
             return claims.First();
+        }
+
+        private Claim GetClaim(Claim claim)
+        {
+            Console.WriteLine($"found claim {claim.Type} with value {claim.Value}");
+            return claim;
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string jwt)
