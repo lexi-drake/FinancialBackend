@@ -55,29 +55,32 @@ namespace WebService
             services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
 
-            services.AddAuthorization();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Events = new JwtBearerEvents
                 {
-                    options.Events = new JwtBearerEvents
+                    OnMessageReceived = context =>
                     {
-                        OnMessageReceived = context =>
-                        {
-                            context.Token = context.Request.Cookies["jwt"];
-                            return Task.CompletedTask;
-                        }
-                    };
-                    options.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateIssuerSigningKey = false,
-                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
-                        ValidateIssuer = true,
-                        ValidIssuer = Configuration["ISSUER"],
-                        ValidateAudience = true,
-                        ValidAudience = Configuration["AUDIENCE"],
-                        ValidateLifetime = true
-                    };
-                });
+                        context.Token = context.Request.Cookies["jwt"];
+                        return Task.CompletedTask;
+                    }
+
+                };
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["ISSUER"],
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["AUDIENCE"],
+                    ValidateLifetime = true
+                };
+            });
 
             services.AddControllers();
         }
