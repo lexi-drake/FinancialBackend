@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 
@@ -34,8 +35,13 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("login")]
+        // This needs to be authorized so that it will return an error if the user
+        // is _not_ logged in.
+
+        [Authorize]
         public ActionResult CheckLoggedIn()
         {
+            // If the request gets this far, it's in the clear.
             return new OkResult();
         }
 
