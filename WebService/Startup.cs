@@ -23,8 +23,6 @@ namespace WebService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Console.WriteLine($"Issuer: {Configuration["Jwt:Issuer"]}");
-            Console.WriteLine($"Audience: {Configuration["Jwt:Audience"]}");
             services.AddCors(options =>
             {
                 options.AddPolicy("allow",
@@ -39,15 +37,15 @@ namespace WebService
             services.AddLogging();
 
             services.AddScoped<JwtHelper>(s => new JwtHelper(
-                Configuration["Jwt:Secret"],
-                Configuration["Jwt:Issuer"],
-                Configuration["Jwt:Audience"]));
+                Configuration["JWT_SECRET"],
+                Configuration["ISSUER"],
+                Configuration["AUDIENCE"]));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILedgerRepository>(s =>
-                new LedgerRepository(Configuration["ConnectionStrings:MongoDB"], Configuration["ConnectionStrings:LedgerDB"]));
+                new LedgerRepository(Configuration["MONGO_DB"], Configuration["LEDGER_DB"]));
             services.AddScoped<IUserRepository>(s =>
-                new UserRepository(Configuration["ConnectionStrings:MongoDB"], Configuration["ConnectionStrings:UsersDB"]));
+                new UserRepository(Configuration["MONGO_DB"], Configuration["USERS_DB"]));
 
             services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
             services.AddTransient<IValidator<IncomeGeneratorRequest>, IncomeGeneratorRequestValidator>();
@@ -63,11 +61,11 @@ namespace WebService
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuerSigningKey = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["Jwt:Secret"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
                     ValidateIssuer = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidIssuer = Configuration["ISSUER"],
                     ValidateAudience = true,
-                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidAudience = Configuration["AUDIENCE"],
                     ValidateLifetime = true
                 };
                 options.Events = new JwtBearerEvents
