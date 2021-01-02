@@ -25,7 +25,6 @@ namespace WebService
 
         public Token CreateToken(string userId, string role)
         {
-            Console.WriteLine($"Creating token for {userId} with role: {role}");
             return new Token()
             {
                 Jwt = CreateJwt(userId, role),
@@ -53,14 +52,13 @@ namespace WebService
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return tokenHandler.WriteToken(token);
         }
 
         private SymmetricSecurityKey GetSecurityKey()
         {
             return new SymmetricSecurityKey(Convert.FromBase64String(_secret));
         }
-
 
         private string CreateRefresh(int size = REFRESH_TOKEN_SIZE)
         {
@@ -82,9 +80,12 @@ namespace WebService
         private Claim GetClaimByType(string jwt, string type)
         {
             var principal = GetPrincipalFromExpiredToken(jwt);
-            var claims = from claim in principal.Claims
+            var ids = principal.Identities;
+            var claims = from id in ids
+                         from claim in id.Claims
                          where claim.Type == type
                          select claim;
+
             if (claims.Any())
             {
                 return null;
@@ -96,8 +97,8 @@ namespace WebService
         {
             var parameters = new TokenValidationParameters()
             {
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidateAudience = true,
                 ValidateLifetime = false,
                 IssuerSigningKey = GetSecurityKey(),
                 ClockSkew = TimeSpan.Zero

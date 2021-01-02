@@ -61,18 +61,18 @@ namespace WebService
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                options.Events = new JwtBearerEvents
+                options.Events = new JwtBearerEvents()
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["jwt"];
+                        context.Token = $"Bearer {context.Request.Cookies["jwt"]}";
                         return Task.CompletedTask;
                     }
 
                 };
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    ValidateIssuerSigningKey = false,
+                    ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
                     ValidateIssuer = true,
                     ValidIssuer = Configuration["ISSUER"],
