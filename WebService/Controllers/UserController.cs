@@ -33,6 +33,13 @@ namespace WebService.Controllers
         }
 
         [HttpGet]
+        [Route("login")]
+        public ActionResult CheckLoggedIn()
+        {
+            return new OkResult();
+        }
+
+        [HttpGet]
         [Route("refresh")]
         public async Task<ActionResult> RefreshToken()
         {
@@ -57,13 +64,6 @@ namespace WebService.Controllers
             }
             PrepareCookies(token);
             return new OkResult();
-        }
-
-        [HttpPost]
-        [Route("role")]
-        public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRole request)
-        {
-            return new OkObjectResult(await _service.AddUserRoleAsync(request));
         }
 
         private void PrepareCookies(Token token)

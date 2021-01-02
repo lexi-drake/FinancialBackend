@@ -10,7 +10,7 @@ namespace WebService
     public class UserService : IUserService
     {
         private const int SALT_SIZE = 32;
-        private const string USER_ROLE = "User";
+        private const string USER_ROLE = "Admin";
         private readonly ILogger<UserService> _logger;
         private IUserRepository _repo;
         private JwtHelper _jwt;
@@ -111,11 +111,6 @@ namespace WebService
                 _logger.LogError(ex.Message);
                 throw;
             }
-        }
-
-        public async Task<UserRole> AddUserRoleAsync(UserRole role)
-        {
-            return await _repo.InsertUserRoleAsync(role);
         }
     }
 }
