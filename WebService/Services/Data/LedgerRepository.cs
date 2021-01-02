@@ -11,7 +11,7 @@ namespace WebService
 
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesForUserAsync(string userId)
+        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId)
         {
             throw new NotImplementedException();
         }

@@ -12,18 +12,25 @@ namespace WebService.Controllers
     {
         private readonly ILogger<LedgerController> _logger;
         private ILedgerService _service;
+        private JwtHelper _jwt;
 
-        public LedgerController(ILogger<LedgerController> logger, ILedgerService service)
+        public LedgerController(ILogger<LedgerController> logger, ILedgerService service, JwtHelper jwt)
         {
             _logger = logger;
             _service = service;
+            _jwt = jwt;
         }
 
         [HttpGet]
         [Route("")]
         public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries()
         {
-            throw new NotImplementedException();
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.GetLedgerEntriesByUserIdAsync(userId));
         }
 
         [HttpPost]
@@ -40,17 +47,13 @@ namespace WebService.Controllers
             throw new NotImplementedException();
         }
 
-        private Token GetTokenFromCookie()
+        private string GetUserIdFromCookie()
         {
-            if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt) || !HttpContext.Request.Cookies.TryGetValue("refresh", out var refresh))
+            if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt))
             {
                 return null;
             }
-            return new Token()
-            {
-                Jwt = jwt,
-                Refresh = refresh
-            };
+            return _jwt.GetUserIdFromToken(jwt);
         }
     }
 }

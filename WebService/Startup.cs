@@ -55,12 +55,7 @@ namespace WebService
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
 
             services.AddAuthorization();
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            })
-            .AddCookie()
+            services.AddAuthentication()
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()
@@ -82,7 +77,6 @@ namespace WebService
                     }
                 };
             });
-
 
             services.AddControllers();
         }

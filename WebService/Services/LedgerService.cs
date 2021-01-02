@@ -19,12 +19,12 @@ namespace WebService
 
         public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId)
         {
-            return await _repo.GetLedgerEntriesForUserAsync(userId);
+            return await _repo.GetLedgerEntriesByUserIdAsync(userId);
         }
 
         public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime startDate, DateTime endDate, string userId)
         {
-            return from ledger in await _repo.GetLedgerEntriesForUserAsync(userId)
+            return from ledger in await _repo.GetLedgerEntriesByUserIdAsync(userId)
                    where ledger.TransactionDate >= startDate && ledger.TransactionDate <= endDate
                    select ledger;
         }

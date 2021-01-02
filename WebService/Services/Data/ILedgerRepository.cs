@@ -5,7 +5,7 @@ namespace WebService
 {
     public interface ILedgerRepository
     {
-        Task<IEnumerable<LedgerEntry>> GetLedgerEntriesForUserAsync(string userId);
+        Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId);
         Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntry entry);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesAsync();
         Task<LedgerEntryCategory> InsertLedgerEntryCategoryAsync(LedgerEntryCategory category);
