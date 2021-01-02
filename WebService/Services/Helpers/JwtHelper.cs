@@ -47,6 +47,8 @@ namespace WebService
                     new Claim(ClaimTypes.Role, role)
                 }),
                 Expires = DateTime.Now.AddMinutes(LOGIN_MINUTES),
+                Issuer = _issuer,
+                Audience = _audience,
                 SigningCredentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM)
             };
 

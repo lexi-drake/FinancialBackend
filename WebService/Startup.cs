@@ -38,10 +38,14 @@ namespace WebService
             services.AddMvc().AddFluentValidation();
             services.AddLogging();
 
+            var audience = Configuration["AUDIENCE"];
+            Console.WriteLine($"audience: {audience}");
+            var issuer = Configuration["ISSUER"];
+            Console.WriteLine($"issuer: {issuer}");
             services.AddScoped<JwtHelper>(s => new JwtHelper(
                 Configuration["JWT_SECRET"],
-                Configuration["ISSUER"],
-                Configuration["AUDIENCE"]));
+                issuer,
+                audience));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILedgerRepository>(s =>
@@ -78,13 +82,12 @@ namespace WebService
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
                     ValidateIssuer = true,
-                    ValidIssuer = Configuration["ISSUER"],
+                    ValidIssuer = issuer,
                     ValidateAudience = true,
-                    ValidAudience = Configuration["AUDIENCE"],
+                    ValidAudience = audience,
                     ValidateLifetime = true
                 };
             });
-            services.AddAuthorization();
 
             services.AddControllers();
         }
