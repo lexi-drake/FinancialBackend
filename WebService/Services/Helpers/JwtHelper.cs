@@ -83,11 +83,10 @@ namespace WebService
         {
             Console.WriteLine($"getting {type} from jwt");
             var principal = GetPrincipalFromExpiredToken(jwt);
-            var ids = principal.Identities;
+            var ids = principal.Claims;
             var claims = from id in ids
-                         from claim in id.Claims
-                         where claim.Type == type
-                         select GetClaim(claim);
+                         where id.Type == type
+                         select GetClaim(id);
 
             if (claims.Any())
             {
