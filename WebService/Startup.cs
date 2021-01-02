@@ -56,27 +56,29 @@ namespace WebService
 
             services.AddAuthorization();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters()
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuerSigningKey = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
-                    ValidateIssuer = true,
-                    ValidIssuer = Configuration["ISSUER"],
-                    ValidateAudience = true,
-                    ValidAudience = Configuration["AUDIENCE"],
-                    ValidateLifetime = true
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
+                    options.Events = new JwtBearerEvents
                     {
-                        context.Token = context.Request.Cookies["jwt"];
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                        OnMessageReceived = context =>
+                        {
+                            Console.WriteLine($"jwt: {context.Request.Cookies["jwt"]}");
+                            context.Token = context.Request.Cookies["jwt"];
+                            Console.WriteLine($"token: {context.Token}");
+                            return Task.CompletedTask;
+                        }
+                    };
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuerSigningKey = false,
+                        IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["ISSUER"],
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["AUDIENCE"],
+                        ValidateLifetime = true
+                    };
+                });
 
             services.AddControllers();
         }

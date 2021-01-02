@@ -34,10 +34,27 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
+        [Route("fordatespan")]
+        public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries([FromBody] DateSpanRequest request)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.GetLedgerEntriesBetweenDatesAsync(request.StartDate, request.EndDate, userId));
+        }
+
+        [HttpPost]
         [Route("")]
         public async Task<ActionResult<LedgerEntry>> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
         {
-            throw new NotImplementedException();
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.AddLedgerEntryAsync(request, userId));
         }
 
         [HttpPost]

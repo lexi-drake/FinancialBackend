@@ -29,7 +29,7 @@ namespace WebService
                    select ledger;
         }
 
-        public async Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntryRequest request, string userId)
+        public async Task<LedgerEntry> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
         {
             var categoryId = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
             return await _repo.InsertLedgerEntryAsync(new LedgerEntry()
@@ -54,7 +54,7 @@ namespace WebService
             return await _repo.GetIncomeGeneratorsByUserIdAsync(userId);
         }
 
-        public async Task<IncomeGenerator> InsertIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId)
+        public async Task<IncomeGenerator> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId)
         {
             // Validation ensures non-duplicate income generator
 
@@ -64,7 +64,7 @@ namespace WebService
             var transactionIds = new List<string>();
             foreach (var transaction in request.RecurringTransactions)
             {
-                transactionIds.Add((await InsertRecurringTransactionAsync(transaction, userId)).Id);
+                transactionIds.Add((await AddRecurringTransactionAsync(transaction, userId)).Id);
             }
 
             return await _repo.InsertIncomeGeneratorAsync(new IncomeGenerator()
@@ -83,7 +83,7 @@ namespace WebService
             return await _repo.GetRecurringTransactionsByUserIdAsync(userId);
         }
 
-        public async Task<RecurringTransaction> InsertRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
+        public async Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
         {
             var categoryId = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
             return await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
