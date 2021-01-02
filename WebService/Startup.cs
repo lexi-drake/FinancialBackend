@@ -53,6 +53,7 @@ namespace WebService
             services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
 
+            services.AddAuthorization();
             services.AddAuthentication(configuratinOptions =>
             {
                 configuratinOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
