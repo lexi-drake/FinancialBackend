@@ -10,7 +10,7 @@ namespace WebService
     public class UserService : IUserService
     {
         private const int SALT_SIZE = 32;
-        private const string USER_ROLE = "Admin";
+        private const string USER_ROLE = "User";
         private readonly ILogger<UserService> _logger;
         private IUserRepository _repo;
         private JwtHelper _jwt;
