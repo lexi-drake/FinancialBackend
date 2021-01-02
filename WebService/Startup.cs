@@ -91,8 +91,8 @@ namespace WebService
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("allow");
-            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
