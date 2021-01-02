@@ -39,9 +39,7 @@ namespace WebService
             services.AddLogging();
 
             var audience = Configuration["AUDIENCE"];
-            Console.WriteLine($"audience: {audience}");
             var issuer = Configuration["ISSUER"];
-            Console.WriteLine($"issuer: {issuer}");
             services.AddScoped<JwtHelper>(s => new JwtHelper(
                 Configuration["JWT_SECRET"],
                 issuer,
@@ -75,15 +73,8 @@ namespace WebService
                 {
                     OnMessageReceived = context =>
                     {
-                        foreach (var c in context.Request.Cookies)
-                        {
-                            Console.WriteLine($"{c.Key}: {c.Value}");
-                        }
-                        Console.WriteLine($"Received cookie: {context.Request.Cookies["jwt"]}");
                         var token = context.Request.Cookies["jwt"].ExtractJwtFromCookie();
-                        Console.WriteLine($"Token: {token}");
                         context.Token = token;
-                        Console.WriteLine($"Received token: {context.Token}");
                         return Task.CompletedTask;
                     }
                 };
