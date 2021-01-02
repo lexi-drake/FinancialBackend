@@ -1,3 +1,5 @@
+
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,8 +75,11 @@ namespace WebService.Controllers
 
         private string GetUserIdFromCookie()
         {
+            Console.WriteLine("getting userid from cookie");
+            _logger.LogError("getting userid from cookie");
             if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt))
             {
+                Console.WriteLine("Unable to get userid from cookie");
                 _logger.LogError("Unable to get userid from cookie");
                 return null;
             }
