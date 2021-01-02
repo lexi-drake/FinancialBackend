@@ -55,7 +55,8 @@ namespace WebService
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
 
             services.AddAuthorization();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            services.AddAuthentication()
+            .AddCookie()
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()
@@ -88,7 +89,7 @@ namespace WebService
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("allow");
-            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
