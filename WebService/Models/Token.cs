@@ -1,4 +1,6 @@
 using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace WebService
 {
@@ -10,6 +12,8 @@ namespace WebService
 
     public class RefreshData
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string Refresh { get; set; }
         public string UserId { get; set; }

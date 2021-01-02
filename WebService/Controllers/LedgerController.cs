@@ -33,9 +33,9 @@ namespace WebService.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("categories")]
-        public async Task<ActionResult<IEnumerable<LedgerEntryCategory>>> GetLedgerEntryCategories()
+        public async Task<ActionResult<IEnumerable<LedgerEntryCategory>>> GetLedgerEntryCategories([FromBody] CategoryCompleteRequest request)
         {
             throw new NotImplementedException();
         }
