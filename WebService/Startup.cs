@@ -26,12 +26,15 @@ namespace WebService
         {
             services.AddCors(options =>
             {
-                options.AddPolicy(name: "allow", builder =>
-                {
-                    builder.WithOrigins("*");
-                    builder.WithHeaders("Content-Type");
-                });
+                options.AddPolicy("allow",
+                builder =>
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                );
             });
+
+            services.AddMvc().AddFluentValidation();
             services.AddLogging();
 
             services.AddScoped<JwtHelper>(s => new JwtHelper(
@@ -45,7 +48,6 @@ namespace WebService
             services.AddScoped<IUserRepository>(s =>
                 new UserRepository(Configuration["ConnectionStrings:MongoDB"], Configuration["ConnectionStrings:UsersDB"]));
 
-            services.AddMvc().AddFluentValidation();
             services.AddTransient<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
             services.AddTransient<IValidator<IncomeGeneratorRequest>, IncomeGeneratorRequestValidator>();
             services.AddTransient<IValidator<LedgerEntryRequest>, LedgerEntryRequestValidator>();
@@ -76,21 +78,17 @@ namespace WebService
                     }
                 };
             });
+
+
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
+            app.UseCors("allow");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
