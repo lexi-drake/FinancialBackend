@@ -39,5 +39,18 @@ namespace WebService.Controllers
         {
             throw new NotImplementedException();
         }
+
+        private Token GetTokenFromCookie()
+        {
+            if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt) || !HttpContext.Request.Cookies.TryGetValue("refresh", out var refresh))
+            {
+                return null;
+            }
+            return new Token()
+            {
+                Jwt = jwt,
+                Refresh = refresh
+            };
+        }
     }
 }
