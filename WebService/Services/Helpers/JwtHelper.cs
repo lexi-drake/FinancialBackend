@@ -23,18 +23,19 @@ namespace WebService
             _audience = audience;
         }
 
-        public Token CreateToken(string userId, string roleId)
+        public Token CreateToken(string userId, string role)
         {
+            Console.WriteLine($"Creating token for {userId} with role: {role}");
             return new Token()
             {
-                Jwt = CreateJwt(userId, roleId),
+                Jwt = CreateJwt(userId, role),
                 Refresh = CreateRefresh()
             };
         }
 
-        private string CreateJwt(string userid, string roleId)
+        private string CreateJwt(string userid, string role)
         {
-            if (string.IsNullOrEmpty(userid) || string.IsNullOrEmpty(roleId))
+            if (string.IsNullOrEmpty(userid) || string.IsNullOrEmpty(role))
             {
                 return null;
             }
@@ -42,7 +43,7 @@ namespace WebService
             var claims = new Claim[]
             {
                 new Claim(ClaimTypes.Name, userid),
-                new Claim(ClaimTypes.Role, roleId)
+                new Claim(ClaimTypes.Role, role)
             };
 
             var expiration = DateTime.Now.AddMinutes(LOGIN_MINUTES);

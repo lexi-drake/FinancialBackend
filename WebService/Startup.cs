@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -62,9 +63,7 @@ namespace WebService
                     {
                         OnMessageReceived = context =>
                         {
-                            Console.WriteLine($"jwt: {context.Request.Cookies["jwt"]}");
                             context.Token = context.Request.Cookies["jwt"];
-                            Console.WriteLine($"token: {context.Token}");
                             return Task.CompletedTask;
                         }
                     };
