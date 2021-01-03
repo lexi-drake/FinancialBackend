@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace WebService.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, IsEssential = true };
+        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, IsEssential = true, Expires = new DateTimeOffset(DateTime.Now.AddMinutes(15)) };
         private readonly ILogger<UserController> _logger;
         private IUserService _service;
 
@@ -94,8 +95,8 @@ namespace WebService.Controllers
 
         private void ClearCookies()
         {
-            HttpContext.Response.Cookies.Delete("jwt");
-            HttpContext.Response.Cookies.Delete("refresh");
+            HttpContext.Response.Cookies.Delete("jwt", Options);
+            HttpContext.Response.Cookies.Delete("refresh", Options);
         }
 
         private Token GetTokenFromCookie()
