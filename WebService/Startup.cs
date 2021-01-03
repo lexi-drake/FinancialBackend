@@ -28,7 +28,7 @@ namespace WebService
                 // AllowAnyOrigin is incompatible with AllowCredentials so we're just
                 // not checking origins.
                 options.AddPolicy("allow",
-                builder => builder.SetIsOriginAllowed(o => true)
+                builder => builder.WithOrigins("http://localhost:3000")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials()
