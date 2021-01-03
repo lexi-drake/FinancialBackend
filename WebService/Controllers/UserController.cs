@@ -10,7 +10,7 @@ namespace WebService.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict, IsEssential = true };
+        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Lax, IsEssential = true };
         private readonly ILogger<UserController> _logger;
         private IUserService _service;
 
@@ -29,7 +29,7 @@ namespace WebService.Controllers
             {
                 return new NotFoundResult();
             }
-            PrepareCookies(token);
+            SetCookies(token);
             return new OkResult();
         }
 
@@ -55,7 +55,7 @@ namespace WebService.Controllers
                 return new UnauthorizedResult();
             }
             var newToken = await _service.RefreshLoginAsync(token);
-            PrepareCookies(newToken);
+            SetCookies(newToken);
             return new OkResult();
         }
 
@@ -68,19 +68,34 @@ namespace WebService.Controllers
             {
                 return new NotFoundResult();
             }
-            PrepareCookies(token);
+            SetCookies(token);
             return new OkResult();
         }
 
-        private void PrepareCookies(Token token)
+        [HttpGet]
+        [Route("logout")]
+        [Authorize]
+        public async Task<ActionResult> LogoutUser()
         {
-            // Delete existing cookies, useful for refreshing
-            HttpContext.Response.Cookies.Delete("jwt");
-            HttpContext.Response.Cookies.Delete("refresh");
+            // TODO (alexa): Delete refresh token from db.
+            // The refresh token expires an hour after it was created, thanks to 
+            // a TTL index, but we should probably go ahead and delete it here
+            // just to be safe.
+            ClearCookies();
+            return new OkResult();
+        }
 
+        private void SetCookies(Token token)
+        {
             // Set the cookie with the token values
             HttpContext.Response.Cookies.Append("jwt", token.Jwt, Options);
             HttpContext.Response.Cookies.Append("refresh", token.Refresh, Options);
+        }
+
+        private void ClearCookies()
+        {
+            HttpContext.Response.Cookies.Delete("jwt");
+            HttpContext.Response.Cookies.Delete("refresh");
         }
 
         private Token GetTokenFromCookie()
