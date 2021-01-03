@@ -10,7 +10,7 @@ namespace WebService.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict };
+        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.Strict, IsEssential = true };
         private readonly ILogger<UserController> _logger;
         private IUserService _service;
 
