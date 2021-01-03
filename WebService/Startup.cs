@@ -27,11 +27,13 @@ namespace WebService
         {
             services.AddCors(options =>
             {
+                // AllowAnyOrigin is incompatible with AllowCredentials so we're just
+                // not checking origins.
                 options.AddPolicy("allow",
-                builder =>
-                    builder.AllowAnyOrigin()
+                builder => builder.SetIsOriginAllowed(o => true)
                         .AllowAnyMethod()
                         .AllowAnyHeader()
+                        .AllowCredentials()
                 );
             });
 
@@ -40,10 +42,8 @@ namespace WebService
 
             var audience = Configuration["AUDIENCE"];
             var issuer = Configuration["ISSUER"];
-            services.AddScoped<JwtHelper>(s => new JwtHelper(
-                Configuration["JWT_SECRET"],
-                issuer,
-                audience));
+            var secret = Configuration["JWT_SECRET"];
+            services.AddScoped<JwtHelper>(s => new JwtHelper(secret, issuer, audience));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAdminService, AdminService>();
@@ -81,7 +81,7 @@ namespace WebService
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Configuration["JWT_SECRET"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(secret)),
                     ValidateIssuer = true,
                     ValidIssuer = issuer,
                     ValidateAudience = true,

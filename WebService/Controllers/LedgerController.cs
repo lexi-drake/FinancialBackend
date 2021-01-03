@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
 namespace WebService.Controllers
 {
     [ApiController]
     [Route("api/ledger")]
+    [Authorize]
     public class LedgerController : ControllerBase
     {
         private readonly ILogger<LedgerController> _logger;
