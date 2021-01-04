@@ -1,4 +1,5 @@
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,6 +79,14 @@ namespace WebService.Controllers
                 return new UnauthorizedResult();
             }
             return new OkObjectResult(await _service.AddUserRoleAsync(request, userId));
+        }
+
+        [HttpPost]
+        [Route("user/role")]
+        public async Task<ActionResult> ChangeUserRole([FromBody] UpdateUserRoleRequest request)
+        {
+            await _service.UpdateUserRoleAsync(request);
+            return new OkResult();
         }
 
         private string GetUserIdFromCookie()

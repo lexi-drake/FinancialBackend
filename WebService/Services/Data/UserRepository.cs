@@ -32,6 +32,14 @@ namespace WebService
             return user;
         }
 
+        public async Task UpdateUserRoleAsync(string userId, string role)
+        {
+            var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
+            var update = Builders<User>.Update.Set(x => x.Role, role);
+
+            await _db.GetCollection<User>().UpdateOneAsync(filter, update);
+        }
+
         public async Task<IEnumerable<RefreshData>> GetRefreshDataByUserIdAsync(string userId)
         {
             var filter = Builders<RefreshData>.Filter.Eq(x => x.UserId, userId);

@@ -7,7 +7,7 @@ namespace WebService
     {
         Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId);
         Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntry entry);
-        Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByNameAsync(string name);
+        Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(string partial);
         Task<LedgerEntryCategory> InsertLedgerEntryCategoryAsync(LedgerEntryCategory category);
         Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId);

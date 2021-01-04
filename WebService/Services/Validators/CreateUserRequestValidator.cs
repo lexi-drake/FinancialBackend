@@ -15,6 +15,7 @@ namespace WebService
             RuleFor(x => x.Username)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
+                .Must(username => !username.Contains(' ')).WithMessage("Username cannot contain spaces.")
                 .MustAsync(async (username, cancellation) =>
                 {
                     var usernames = await _repo.GetUsersByUsernameAsync(username);

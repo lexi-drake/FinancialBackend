@@ -26,15 +26,15 @@ namespace WebService
             return entry;
         }
 
-        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByNameAsync(string name)
+        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category)
         {
-            var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Name, name);
+            var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Category, category);
             return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(string regex)
         {
-            var filter = Builders<LedgerEntryCategory>.Filter.Regex(x => x.Name, regex);
+            var filter = Builders<LedgerEntryCategory>.Filter.Regex(x => x.Category, regex);
             return await _db.FindWithFilterAsync(filter);
         }
 

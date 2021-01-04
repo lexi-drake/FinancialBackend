@@ -101,8 +101,8 @@ namespace WebService
 
         private async Task<string> GetOrInsertLedgerEntryCategoryAsync(string category)
         {
-            var categoryIds = from c in await _repo.GetLedgerEntryCategoriesByNameAsync(category)
-                              where c.Name.Equals(category, StringComparison.InvariantCultureIgnoreCase)
+            var categoryIds = from c in await _repo.GetLedgerEntryCategoriesByCategoryAsync(category)
+                              where c.Category.Equals(category, StringComparison.InvariantCultureIgnoreCase)
                               select c.Id;
 
             if (categoryIds.Any())
@@ -116,7 +116,7 @@ namespace WebService
                 // and use its id
                 var ledgerEntryCategory = await _repo.InsertLedgerEntryCategoryAsync(new LedgerEntryCategory()
                 {
-                    Name = category,
+                    Category = category,
                     CreatedDate = DateTime.Now
                 });
                 return ledgerEntryCategory.Id;
