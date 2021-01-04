@@ -7,5 +7,6 @@ namespace WebService
         Task<Token> CreateUserAsync(CreateUserRequest request);
         Task<Token> LoginUserAsync(LoginRequest request);
         Task<Token> RefreshLoginAsync(Token token);
+        Task LogoutUserAsync(Token token);
     }
 }

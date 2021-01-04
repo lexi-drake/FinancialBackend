@@ -44,9 +44,10 @@ namespace WebService
             });
         }
 
-        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesAsync()
+        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(CategoryCompleteRequest request)
         {
-            return await _repo.GetLedgerEntryCategoriesAsync();
+            var regex = $".*{request.Partial}.*";
+            return await _repo.GetLedgerEntryCategoriesLikeAsync(regex);
         }
 
         public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId)
@@ -100,7 +101,7 @@ namespace WebService
 
         private async Task<string> GetOrInsertLedgerEntryCategoryAsync(string category)
         {
-            var categoryIds = from c in await _repo.GetLedgerEntryCategoriesAsync()
+            var categoryIds = from c in await _repo.GetLedgerEntryCategoriesByNameAsync(category)
                               where c.Name.Equals(category, StringComparison.InvariantCultureIgnoreCase)
                               select c.Id;
 

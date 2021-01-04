@@ -22,6 +22,14 @@ namespace WebService.Controllers
             _jwt = jwt;
         }
 
+        [HttpGet]
+        [Route("")]
+        public ActionResult CheckAdmin()
+        {
+            // Like UserController.CheckLoggedIn, if the request gets this far, it's good.
+            return new OkResult();
+        }
+
         [HttpPost]
         [Route("frequency")]
         public async Task<ActionResult<Frequency>> AddFrequency([FromBody] FrequencyRequest request)

@@ -112,5 +112,22 @@ namespace WebService
                 throw;
             }
         }
+
+        public async Task LogoutUserAsync(Token token)
+        {
+            if (!string.IsNullOrEmpty(token.Jwt))
+            {
+                throw new ArgumentException("Cannot logout user with empty jwt token");
+            }
+
+            var userId = _jwt.GetUserIdFromToken(token.Jwt);
+
+            var ids = from data in await _repo.GetRefreshDataByUserIdAsync(userId)
+                      select data.Id;
+            foreach (var id in ids)
+            {
+                await _repo.DeleteRefreshDataByIdAsync(id);
+            }
+        }
     }
 }

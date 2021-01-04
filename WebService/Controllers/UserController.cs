@@ -38,7 +38,6 @@ namespace WebService.Controllers
         [Route("login")]
         // This needs to be authorized so that it will return an error if the user
         // is _not_ logged in.
-
         [Authorize]
         public ActionResult CheckLoggedIn()
         {
@@ -78,12 +77,26 @@ namespace WebService.Controllers
         [Authorize]
         public async Task<ActionResult> LogoutUser()
         {
-            // TODO (alexa): Delete refresh token from db.
-            // The refresh token expires an hour after it was created, thanks to 
-            // a TTL index, but we should probably go ahead and delete it here
-            // just to be safe.
+            var token = GetTokenFromCookie();
+            if (token is null)
+            {
+                return new NotFoundResult();
+            }
+
+            ActionResult result = new OkResult();
+            try
+            {
+                // This throws an ArgumentException if the jwt is empty
+                await _service.LogoutUserAsync(token);
+            }
+            catch (ArgumentException ex)
+            {
+                // We're not throwing the exception here because we want to propogate
+                // the error message to the front end instead of just sending a 500.
+                result = new UnauthorizedObjectResult(ex.Message);
+            }
             ClearCookies();
-            return new OkResult();
+            return result;
         }
 
         private void SetCookies(Token token)
@@ -95,6 +108,8 @@ namespace WebService.Controllers
 
         private void ClearCookies()
         {
+            // This doesn't actually delete the cookie, it returns an empty value
+            // to the client so that the client deletes the cookie.
             HttpContext.Response.Cookies.Delete("jwt", Options);
             HttpContext.Response.Cookies.Delete("refresh", Options);
         }

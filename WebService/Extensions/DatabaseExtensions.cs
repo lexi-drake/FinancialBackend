@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 
 namespace WebService
@@ -15,6 +17,12 @@ namespace WebService
         {
             return type.ToString().Split('.').Last();
 
+        }
+
+        public static async Task<IEnumerable<T>> FindWithFilterAsync<T>(this IMongoDatabase database, FilterDefinition<T> filter)
+        {
+            var cursor = await database.GetCollection<T>().FindAsync(filter);
+            return await cursor.ToListAsync();
         }
     }
 }

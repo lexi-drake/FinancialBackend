@@ -17,19 +17,13 @@ namespace WebService
         public async Task<IEnumerable<User>> GetUsersByIdAsync(string userId)
         {
             var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
-            return await GetUsersWithFilter(filter);
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<IEnumerable<User>> GetUsersByUsernameAsync(string username)
         {
             var filter = Builders<User>.Filter.Eq(x => x.Username, username);
-            return await GetUsersWithFilter(filter);
-        }
-
-        private async Task<IEnumerable<User>> GetUsersWithFilter(FilterDefinition<User> filter)
-        {
-            var cursor = await _db.GetCollection<User>().FindAsync<User>(filter);
-            return await cursor.ToListAsync();
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<User> InsertUserAsync(User user)
@@ -41,9 +35,7 @@ namespace WebService
         public async Task<IEnumerable<RefreshData>> GetRefreshDataByUserIdAsync(string userId)
         {
             var filter = Builders<RefreshData>.Filter.Eq(x => x.UserId, userId);
-
-            var cursor = await _db.GetCollection<RefreshData>().FindAsync<RefreshData>(filter);
-            return await cursor.ToListAsync();
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<RefreshData> InsertRefreshDataAsync(RefreshData data)
@@ -60,10 +52,7 @@ namespace WebService
 
         public async Task<IEnumerable<UserRole>> GetUserRolesAsync()
         {
-            var filter = FilterDefinition<UserRole>.Empty;
-
-            var cursor = await _db.GetCollection<UserRole>().FindAsync<UserRole>(filter);
-            return await cursor.ToListAsync();
+            return await _db.FindWithFilterAsync(FilterDefinition<UserRole>.Empty);
         }
 
         public async Task<UserRole> InsertUserRoleAsync(UserRole role)

@@ -1,88 +1,112 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace WebService
 {
     public class LedgerRepository : ILedgerRepository
     {
+        private IMongoDatabase _db;
+
         public LedgerRepository(string connectionString, string database)
         {
-
+            _db = new MongoClient(connectionString).GetDatabase(database);
         }
 
         public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            var filter = Builders<LedgerEntry>.Filter.Eq(x => x.UserId, userId);
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntry entry)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<LedgerEntry>().InsertOneAsync(entry);
+            return entry;
         }
 
-        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesAsync()
+        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByNameAsync(string name)
         {
-            throw new NotImplementedException();
+            var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Name, name);
+            return await _db.FindWithFilterAsync(filter);
+        }
+
+        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(string regex)
+        {
+            var filter = Builders<LedgerEntryCategory>.Filter.Regex(x => x.Name, regex);
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<LedgerEntryCategory> InsertLedgerEntryCategoryAsync(LedgerEntryCategory category)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<LedgerEntryCategory>().InsertOneAsync(category);
+            return category;
         }
 
         public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            var filter = Builders<IncomeGenerator>.Filter.Eq(x => x.UserId, userId);
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<IncomeGenerator> InsertIncomeGeneratorAsync(IncomeGenerator generator)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<IncomeGenerator>().InsertOneAsync(generator);
+            return generator;
         }
 
-        public async Task UpdateIncomeGeneratorRecurringTransactionsAsync(string userId, IEnumerable<string> transactions)
+        public async Task SetIncomeGeneratorRecurringTransactionsAsync(string id, IEnumerable<string> transactions)
         {
-            throw new NotImplementedException();
+            var filter = Builders<IncomeGenerator>.Filter.Eq(x => x.Id, id);
+            var update = Builders<IncomeGenerator>.Update.Set(x => x.RecurringTransactions, transactions);
+
+            await _db.GetCollection<IncomeGenerator>().UpdateOneAsync(filter, update);
         }
 
         public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
         {
-            throw new NotImplementedException();
+            var filter = Builders<RecurringTransaction>.Filter.Eq(x => x.UserId, userId);
+            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<RecurringTransaction> InsertRecurringTransactionAsync(RecurringTransaction transaction)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<RecurringTransaction>().InsertOneAsync(transaction);
+            return transaction;
         }
 
         public async Task<IEnumerable<TransactionType>> GetTransactionTypesAsync()
         {
-            throw new NotImplementedException();
+            return await _db.FindWithFilterAsync(FilterDefinition<TransactionType>.Empty);
         }
 
         public async Task<TransactionType> InsertTransactionTypeAsync(TransactionType type)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<TransactionType>().InsertOneAsync(type);
+            return type;
         }
+
         public async Task<IEnumerable<SalaryType>> GetSalaryTypesAsync()
         {
-            throw new NotImplementedException();
+            return await _db.FindWithFilterAsync(FilterDefinition<SalaryType>.Empty);
         }
 
         public async Task<SalaryType> InsertSalaryTypeAsync(SalaryType type)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<SalaryType>().InsertOneAsync(type);
+            return type;
         }
 
         public async Task<IEnumerable<Frequency>> GetFrequenciesAsync()
         {
-            throw new NotImplementedException();
+            return await _db.FindWithFilterAsync(FilterDefinition<Frequency>.Empty);
         }
 
         public async Task<Frequency> InsertFrequencyAsync(Frequency frequency)
         {
-            throw new NotImplementedException();
+            await _db.GetCollection<Frequency>().InsertOneAsync(frequency);
+            return frequency;
         }
     }
 }

@@ -63,7 +63,7 @@ namespace WebService.Controllers
         [Route("categories")]
         public async Task<ActionResult<IEnumerable<LedgerEntryCategory>>> GetLedgerEntryCategories([FromBody] CategoryCompleteRequest request)
         {
-            throw new NotImplementedException();
+            return new OkObjectResult(await _service.GetLedgerEntryCategoriesLikeAsync(request));
         }
 
         private string GetUserIdFromCookie()
