@@ -25,6 +25,10 @@ namespace WebService.Controllers
         [Route("login")]
         public async Task<ActionResult> LoginUser([FromBody] LoginRequest request)
         {
+            // TODO (alexa): this should return the username and role of the user logged in
+            // so that the front end will a) have a verified username to display on the dashboard
+            // (because that would be nice, right?) and b) a link to the admin page can be
+            // displayed for admin users.
             var token = await _service.LoginUserAsync(request);
             if (token is null)
             {
