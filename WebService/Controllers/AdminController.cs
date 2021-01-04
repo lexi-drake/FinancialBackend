@@ -1,5 +1,4 @@
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -85,6 +84,14 @@ namespace WebService.Controllers
         [Route("user/role")]
         public async Task<ActionResult> ChangeUserRole([FromBody] UpdateUserRoleRequest request)
         {
+            // TODO (alexa): Should this prevent the user from changing their own role?
+            // Right now this function requires admin access, so it's not like a User could
+            // change their own role to Admin, but it potentially allows for Admins to change
+            // themselves into regular Users (which, sure... I guess that's ok for now? The
+            // real risk is that the LAST Admin would make themselves a regular User...).
+            // This is really a bigger issue if another role is added that provides different
+            // functionality that Admins don't intrinsically have, which would be a little 
+            // weird in itself.
             await _service.UpdateUserRoleAsync(request);
             return new OkResult();
         }
