@@ -40,6 +40,11 @@ namespace WebService
             await _db.GetCollection<User>().UpdateOneAsync(filter, update);
         }
 
+        public async Task UpdateUsernameAsync(string userId, string username, IEnumerable<UsernameChangeData> changeDatas)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<RefreshData>> GetRefreshDataByUserIdAsync(string userId)
         {
             var filter = Builders<RefreshData>.Filter.Eq(x => x.UserId, userId);

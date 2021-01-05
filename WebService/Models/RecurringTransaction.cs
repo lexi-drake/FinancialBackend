@@ -15,6 +15,8 @@ namespace WebService
         public int Amount { get; set; }
         public string FrequencyId { get; set; }
         public string TransactionTypeId { get; set; }
+        public DateTime LastTriggered { get; set; }
+        public DateTime LastExecuted { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }

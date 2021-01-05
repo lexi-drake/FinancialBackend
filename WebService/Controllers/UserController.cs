@@ -23,19 +23,15 @@ namespace WebService.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult> LoginUser([FromBody] LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> LoginUser([FromBody] LoginRequest request)
         {
-            // TODO (alexa): this should return the username and role of the user logged in
-            // so that the front end will a) have a verified username to display on the dashboard
-            // (because that would be nice, right?) and b) a link to the admin page can be
-            // displayed for admin users.
-            var token = await _service.LoginUserAsync(request);
-            if (token is null)
+            var loginResponse = await _service.LoginUserAsync(request);
+            if (loginResponse is null)
             {
                 return new NotFoundResult();
             }
-            SetCookies(token);
-            return new OkResult();
+            SetCookies(loginResponse.Token);
+            return new OkObjectResult(loginResponse);
         }
 
         [HttpGet]
@@ -65,15 +61,15 @@ namespace WebService.Controllers
 
         [HttpPost]
         [Route("create")]
-        public async Task<ActionResult> CreateUser([FromBody] CreateUserRequest request)
+        public async Task<ActionResult<LoginResponse>> CreateUser([FromBody] CreateUserRequest request)
         {
-            var token = await _service.CreateUserAsync(request);
-            if (token is null)
+            var loginResponse = await _service.CreateUserAsync(request);
+            if (loginResponse is null)
             {
                 return new NotFoundResult();
             }
-            SetCookies(token);
-            return new OkResult();
+            SetCookies(loginResponse.Token);
+            return new OkObjectResult(loginResponse);
         }
 
         [HttpGet]
@@ -101,6 +97,13 @@ namespace WebService.Controllers
             }
             ClearCookies();
             return result;
+        }
+
+        [HttpPost]
+        [Route("edit/username")]
+        public async Task<ActionResult<UpdateUsernameResponse>> UpdateUsername([FromBody] UpdateUsernameRequest request)
+        {
+            throw new NotImplementedException();
         }
 
         private void SetCookies(Token token)

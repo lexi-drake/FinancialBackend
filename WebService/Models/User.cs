@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -11,18 +12,14 @@ namespace WebService
         public string Id { get; set; }
         public string Role { get; set; }
         public string Username { get; set; }
+        public IEnumerable<UsernameChangeData> PreviousUsernames { get; set; }
         public string PasswordHash { get; set; }
-        public string Salt { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 
-    public class UserRole
+    public class UsernameChangeData
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-        public string Description { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string Username { get; set; }
+        public DateTime ChangedDate { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace WebService
             _repo = repo;
 
             RuleFor(x => x.Category).NotEmpty();
-            // Description is optional
+            // Description is optional.
             RuleFor(x => x.Amount).GreaterThan(0);
             RuleFor(x => x.TransactionTypeId)
                 .Cascade(CascadeMode.Stop)
@@ -24,6 +24,7 @@ namespace WebService
                                            select type;
                     return transactionTypes.Any();
                 }).WithMessage("Transaction Type Id must be valid.");
+            // RecurringTransactionId is optional.
             RuleFor(x => x.TransactionDate).LessThanOrEqualTo(DateTime.Now);
         }
     }

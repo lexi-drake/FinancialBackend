@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
 using BC = BCrypt.Net.BCrypt;
 
 namespace WebService
@@ -10,7 +9,8 @@ namespace WebService
     public class UserService : IUserService
     {
         private const int SALT_SIZE = 32;
-        private const string USER_ROLE = "User";
+        // We always want to default the user to the role of User
+        private const string USER_ROLE = "Admin";
         private readonly ILogger<UserService> _logger;
         private IUserRepository _repo;
         private JwtHelper _jwt;
@@ -22,21 +22,21 @@ namespace WebService
             _jwt = jwt;
         }
 
-        public async Task<Token> CreateUserAsync(CreateUserRequest request)
+        public async Task<LoginResponse> CreateUserAsync(CreateUserRequest request)
         {
-            // Validator ensures non-duplicate username
-            var salt = GenerateSalt();
-            var passwordHash = BC.HashPassword(salt + request.Password);
+            var passwordHash = BC.HashPassword(request.Password);
 
-            // Validator ensures role is "User"
+            // Validator ensures non-duplicate username
             await _repo.InsertUserAsync(new User()
             {
                 Role = USER_ROLE,
                 Username = request.Username,
                 PasswordHash = passwordHash,
-                Salt = salt,
                 CreatedDate = DateTime.Now
             });
+
+            // To prevent requiring a second call to the back end, we're just going to 
+            // log the user in and return the login info to the front end.
             return await LoginUserAsync(new LoginRequest()
             {
                 Username = request.Username,
@@ -44,14 +44,7 @@ namespace WebService
             });
         }
 
-        private string GenerateSalt(int size = SALT_SIZE)
-        {
-            var bytes = new byte[size];
-            new RNGCryptoServiceProvider().GetBytes(bytes);
-            return Convert.ToBase64String(bytes);
-        }
-
-        public async Task<Token> LoginUserAsync(LoginRequest request)
+        public async Task<LoginResponse> LoginUserAsync(LoginRequest request)
         {
             var users = await _repo.GetUsersByUsernameAsync(request.Username);
             if (!users.Any())
@@ -60,7 +53,7 @@ namespace WebService
             }
 
             var user = users.First();
-            if (!BC.Verify(user.Salt + request.Password, user.PasswordHash))
+            if (!BC.Verify(request.Password, user.PasswordHash))
             {
                 return null;
             }
@@ -72,7 +65,12 @@ namespace WebService
                 UserId = user.Id,
                 CreatedDate = DateTime.Now
             });
-            return token;
+            return new LoginResponse()
+            {
+                Username = user.Username,
+                Role = user.Role,
+                Token = token
+            };
         }
 
         public async Task<Token> RefreshLoginAsync(Token token)
@@ -128,6 +126,11 @@ namespace WebService
             {
                 await _repo.DeleteRefreshDataByIdAsync(id);
             }
+        }
+
+        public async Task<UpdateUsernameResponse> UpdateUsernameAsync(UpdateUsernameRequest request, Token token)
+        {
+            throw new NotImplementedException();
         }
     }
 }

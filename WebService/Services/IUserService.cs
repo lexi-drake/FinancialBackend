@@ -4,9 +4,10 @@ namespace WebService
 {
     public interface IUserService
     {
-        Task<Token> CreateUserAsync(CreateUserRequest request);
-        Task<Token> LoginUserAsync(LoginRequest request);
+        Task<LoginResponse> CreateUserAsync(CreateUserRequest request);
+        Task<LoginResponse> LoginUserAsync(LoginRequest request);
         Task<Token> RefreshLoginAsync(Token token);
         Task LogoutUserAsync(Token token);
+        Task<UpdateUsernameResponse> UpdateUsernameAsync(UpdateUsernameRequest request, Token token);
     }
 }

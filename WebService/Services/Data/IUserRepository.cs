@@ -9,6 +9,7 @@ namespace WebService
         Task<IEnumerable<User>> GetUsersByUsernameAsync(string username);
         Task<User> InsertUserAsync(User user);
         Task UpdateUserRoleAsync(string userId, string role);
+        Task UpdateUsernameAsync(string userId, string username, IEnumerable<UsernameChangeData> changeDatas);
         Task<IEnumerable<RefreshData>> GetRefreshDataByUserIdAsync(string userId);
         Task<RefreshData> InsertRefreshDataAsync(RefreshData token);
         Task DeleteRefreshDataByIdAsync(string id);
