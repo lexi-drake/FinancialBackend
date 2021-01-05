@@ -10,7 +10,7 @@ namespace WebService
     {
         private const int SALT_SIZE = 32;
         // We always want to default the user to the role of User
-        private const string USER_ROLE = "Admin";
+        private const string USER_ROLE = "User";
         private readonly ILogger<UserService> _logger;
         private IUserRepository _repo;
         private JwtHelper _jwt;
