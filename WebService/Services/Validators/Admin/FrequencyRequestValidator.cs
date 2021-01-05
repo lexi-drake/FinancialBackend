@@ -17,7 +17,7 @@ namespace WebService
                 .NotEmpty()
                 .MustAsync(async (description, cancellation) =>
                 {
-                    var types = from type in await _repo.GetFrequenciesAsync()
+                    var types = from type in await _repo.GetAllAsync<Frequency>()
                                 where type.Description.Equals(description, StringComparison.InvariantCultureIgnoreCase)
                                 select type;
                     return !types.Any();

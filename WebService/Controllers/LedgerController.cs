@@ -66,6 +66,27 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.GetLedgerEntryCategoriesLikeAsync(request));
         }
 
+        [HttpGet]
+        [Route("frequencies")]
+        public async Task<ActionResult<IEnumerable<Frequency>>> GetFrequencies()
+        {
+            return new OkObjectResult(await _service.GetAllAsync<Frequency>());
+        }
+
+        [HttpGet]
+        [Route("salarytypes")]
+        public async Task<ActionResult<IEnumerable<SalaryType>>> GetSalaryTypes()
+        {
+            return new OkObjectResult(await _service.GetAllAsync<SalaryType>());
+        }
+
+        [HttpGet]
+        [Route("transactiontypes")]
+        public async Task<ActionResult<IEnumerable<TransactionType>>> GetTransactionTypes()
+        {
+            return new OkObjectResult(await _service.GetAllAsync<TransactionType>());
+        }
+
         private string GetUserIdFromCookie()
         {
             if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt))

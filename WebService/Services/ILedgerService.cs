@@ -14,5 +14,6 @@ namespace WebService
         Task<IncomeGenerator> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId);
         Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId);
         Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId);
+        Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem;
     }
 }

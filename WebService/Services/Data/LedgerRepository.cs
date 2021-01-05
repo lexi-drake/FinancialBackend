@@ -1,16 +1,18 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Driver;
 
 namespace WebService
 {
     public class LedgerRepository : ILedgerRepository
     {
+        private IMemoryCache _cache;
         private IMongoDatabase _db;
 
-        public LedgerRepository(string connectionString, string database)
+        public LedgerRepository(IMemoryCache cache, string connectionString, string database)
         {
+            _cache = cache;
             _db = new MongoClient(connectionString).GetDatabase(database);
         }
 
@@ -76,37 +78,20 @@ namespace WebService
             return transaction;
         }
 
-        public async Task<IEnumerable<TransactionType>> GetTransactionTypesAsync()
+        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem
         {
-            return await _db.FindWithFilterAsync(FilterDefinition<TransactionType>.Empty);
+            var items = await _cache.GetOrCreateAsync(typeof(T), async (entry) =>
+            {
+                return await _db.FindWithFilterAsync(FilterDefinition<T>.Empty);
+            });
+            return items;
         }
 
-        public async Task<TransactionType> InsertTransactionTypeAsync(TransactionType type)
+        public async Task<T> InsertOneAsync<T>(T item) where T : AbstractLedgerItem
         {
-            await _db.GetCollection<TransactionType>().InsertOneAsync(type);
-            return type;
-        }
-
-        public async Task<IEnumerable<SalaryType>> GetSalaryTypesAsync()
-        {
-            return await _db.FindWithFilterAsync(FilterDefinition<SalaryType>.Empty);
-        }
-
-        public async Task<SalaryType> InsertSalaryTypeAsync(SalaryType type)
-        {
-            await _db.GetCollection<SalaryType>().InsertOneAsync(type);
-            return type;
-        }
-
-        public async Task<IEnumerable<Frequency>> GetFrequenciesAsync()
-        {
-            return await _db.FindWithFilterAsync(FilterDefinition<Frequency>.Empty);
-        }
-
-        public async Task<Frequency> InsertFrequencyAsync(Frequency frequency)
-        {
-            await _db.GetCollection<Frequency>().InsertOneAsync(frequency);
-            return frequency;
+            _cache.Remove(typeof(T));
+            await _db.GetCollection<T>().InsertOneAsync(item);
+            return item;
         }
     }
 }

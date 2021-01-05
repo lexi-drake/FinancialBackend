@@ -17,7 +17,7 @@ namespace WebService
                 .NotEmpty()
                 .MustAsync(async (id, cancellation) =>
                 {
-                    var salaryTypes = from type in await _repo.GetSalaryTypesAsync()
+                    var salaryTypes = from type in await _repo.GetAllAsync<SalaryType>()
                                       where type.Id == id
                                       select type;
                     return salaryTypes.Any();
@@ -27,7 +27,7 @@ namespace WebService
                 .NotEmpty()
                 .MustAsync(async (id, cancellation) =>
                 {
-                    var frequencies = from frequency in await _repo.GetFrequenciesAsync()
+                    var frequencies = from frequency in await _repo.GetAllAsync<Frequency>()
                                       where frequency.Id == id
                                       select frequency;
                     return frequencies.Any();

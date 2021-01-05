@@ -19,7 +19,7 @@ namespace WebService
                 .NotEmpty()
                 .MustAsync(async (id, cancellation) =>
                 {
-                    var frequencies = from frequency in await _repo.GetFrequenciesAsync()
+                    var frequencies = from frequency in await _repo.GetAllAsync<Frequency>()
                                       where frequency.Id == id
                                       select frequency;
                     return frequencies.Any();
@@ -29,7 +29,7 @@ namespace WebService
                 .NotEmpty()
                 .MustAsync(async (id, cancellation) =>
                 {
-                    var transactionTypes = from type in await _repo.GetTransactionTypesAsync()
+                    var transactionTypes = from type in await _repo.GetAllAsync<TransactionType>()
                                            where type.Id == id
                                            select type;
                     return transactionTypes.Any();

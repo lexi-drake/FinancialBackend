@@ -40,7 +40,7 @@ namespace WebService
         public async Task<Frequency> AddFrequencyAsync(FrequencyRequest request, string userId)
         {
             // Validator ensures non-duplicate frequency.
-            return await _ledgerRepo.InsertFrequencyAsync(new Frequency()
+            return await _ledgerRepo.InsertOneAsync(new Frequency()
             {
                 Description = request.Description,
                 CreatedBy = userId,
@@ -51,7 +51,7 @@ namespace WebService
         public async Task<SalaryType> AddSalaryTypeAsync(SalaryTypeRequest request, string userId)
         {
             // Validator ensures non-duplicate type.
-            return await _ledgerRepo.InsertSalaryTypeAsync(new SalaryType()
+            return await _ledgerRepo.InsertOneAsync(new SalaryType()
             {
                 Description = request.Description,
                 CreatedBy = userId,
@@ -62,7 +62,7 @@ namespace WebService
         public async Task<TransactionType> AddTransactionTypeAsync(TransactionTypeRequest request, string userId)
         {
             // Validator ensures non-duplicate type.
-            return await _ledgerRepo.InsertTransactionTypeAsync(new TransactionType()
+            return await _ledgerRepo.InsertOneAsync(new TransactionType()
             {
                 Description = request.Description,
                 CreatedBy = userId,

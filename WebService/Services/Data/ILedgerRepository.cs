@@ -15,11 +15,7 @@ namespace WebService
         Task SetIncomeGeneratorRecurringTransactionsAsync(string id, IEnumerable<string> transactions);
         Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId);
         Task<RecurringTransaction> InsertRecurringTransactionAsync(RecurringTransaction transaction);
-        Task<IEnumerable<TransactionType>> GetTransactionTypesAsync();
-        Task<TransactionType> InsertTransactionTypeAsync(TransactionType type);
-        Task<IEnumerable<SalaryType>> GetSalaryTypesAsync();
-        Task<SalaryType> InsertSalaryTypeAsync(SalaryType type);
-        Task<IEnumerable<Frequency>> GetFrequenciesAsync();
-        Task<Frequency> InsertFrequencyAsync(Frequency frequency);
+        Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem;
+        Task<T> InsertOneAsync<T>(T item) where T : AbstractLedgerItem;
     }
 }

@@ -122,5 +122,10 @@ namespace WebService
                 return ledgerEntryCategory.Id;
             }
         }
+
+        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem
+        {
+            return await _repo.GetAllAsync<T>();
+        }
     }
 }

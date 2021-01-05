@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using FluentValidation;
@@ -35,6 +36,7 @@ namespace WebService
                 );
             });
 
+            services.AddMemoryCache();
             services.AddMvc().AddFluentValidation();
             services.AddLogging();
 
@@ -47,7 +49,7 @@ namespace WebService
             services.AddScoped<IAdminService, AdminService>();
 
             services.AddScoped<ILedgerRepository>(s =>
-                new LedgerRepository(Configuration["MONGO_DB"], Configuration["LEDGER_DB"]));
+                new LedgerRepository(s.GetRequiredService<IMemoryCache>(), Configuration["MONGO_DB"], Configuration["LEDGER_DB"]));
             services.AddScoped<IUserRepository>(s =>
                 new UserRepository(Configuration["MONGO_DB"], Configuration["USERS_DB"]));
 
