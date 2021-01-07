@@ -43,6 +43,7 @@ namespace WebService
             return await _ledgerRepo.InsertOneAsync(new Frequency()
             {
                 Description = request.Description,
+                ApproxTimesPerYear = request.ApproxTimesPerYear,
                 CreatedBy = userId,
                 CreatedDate = DateTime.Now
             });

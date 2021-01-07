@@ -22,6 +22,9 @@ namespace WebService
                                 select type;
                     return !types.Any();
                 }).WithMessage("Description must be unique.");
+            RuleFor(x => x.ApproxTimesPerYear)
+                .GreaterThan(0)
+                .LessThanOrEqualTo(365);
         }
     }
 }
