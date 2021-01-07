@@ -11,7 +11,7 @@ namespace WebService.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, IsEssential = true, Expires = new DateTimeOffset(DateTime.Now.AddMinutes(15)) };
+        private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, IsEssential = true };
         private readonly ILogger<UserController> _logger;
         private IUserService _service;
 
@@ -108,7 +108,7 @@ namespace WebService.Controllers
 
         private void SetCookies(Token token)
         {
-            // Set the cookie with the token values
+            Options.Expires = new DateTimeOffset(DateTime.Now.AddMinutes(15));
             HttpContext.Response.Cookies.Append("jwt", token.Jwt, Options);
             HttpContext.Response.Cookies.Append("refresh", token.Refresh, Options);
         }
@@ -117,6 +117,7 @@ namespace WebService.Controllers
         {
             // This doesn't actually delete the cookie, it returns an empty value
             // to the client so that the client deletes the cookie.
+            Options.Expires = new DateTimeOffset(DateTime.Now.AddMinutes(1));
             HttpContext.Response.Cookies.Delete("jwt", Options);
             HttpContext.Response.Cookies.Delete("refresh", Options);
         }
