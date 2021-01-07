@@ -35,6 +35,9 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.GetLedgerEntriesByUserIdAsync(userId));
         }
 
+        // TODO (alexa): I don't like that this is a post request. This should
+        // absolutely be a get request, maybe something like /dates/{start}{end} 
+        // where start & end are MMDDYYYY? 
         [HttpPost]
         [Route("fordatespan")]
         public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries([FromBody] DateSpanRequest request)
@@ -57,6 +60,30 @@ namespace WebService.Controllers
                 return new UnauthorizedResult();
             }
             return new OkObjectResult(await _service.AddLedgerEntryAsync(request, userId));
+        }
+
+        [HttpGet]
+        [Route("generators")]
+        public async Task<ActionResult<IEnumerable<IncomeGeneratorResponse>>> GetIncomeGenerators()
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.GetIncomeGeneratorsByUserIdAsync(userId));
+        }
+
+        [HttpPost]
+        [Route("generator")]
+        public async Task<ActionResult<IncomeGeneratorResponse>> AddIncomeGenerator([FromBody] IncomeGeneratorRequest request)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.AddIncomeGeneratorAsync(request, userId));
         }
 
         [HttpPost]

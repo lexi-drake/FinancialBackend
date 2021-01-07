@@ -50,12 +50,24 @@ namespace WebService
             return await _repo.GetLedgerEntryCategoriesLikeAsync(regex);
         }
 
-        public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId)
+        public async Task<IEnumerable<IncomeGeneratorResponse>> GetIncomeGeneratorsByUserIdAsync(string userId)
         {
-            return await _repo.GetIncomeGeneratorsByUserIdAsync(userId);
+            var recurringTransactions = await _repo.GetRecurringTransactionsByUserIdAsync(userId);
+            var generators = await _repo.GetIncomeGeneratorsByUserIdAsync(userId);
+
+            var responses = from generator in generators
+                            select new IncomeGeneratorResponse()
+                            {
+                                Id = generator.Id,
+                                Description = generator.Description,
+                                SalaryTypeId = generator.SalaryTypeId,
+                                FrequencyId = generator.FrequencyId,
+                                RecurringTransactions = CompileRecurringTransactions(generator.RecurringTransactions, recurringTransactions)
+                            };
+            return responses;
         }
 
-        public async Task<IncomeGenerator> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId)
+        public async Task<IncomeGeneratorResponse> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId)
         {
             // Validation ensures non-duplicate income generator
 
@@ -68,7 +80,7 @@ namespace WebService
                 transactionIds.Add((await AddRecurringTransactionAsync(transaction, userId)).Id);
             }
 
-            return await _repo.InsertIncomeGeneratorAsync(new IncomeGenerator()
+            var generator = await _repo.InsertIncomeGeneratorAsync(new IncomeGenerator()
             {
                 UserId = userId,
                 Description = request.Description,
@@ -77,6 +89,25 @@ namespace WebService
                 RecurringTransactions = transactionIds,
                 CreatedDate = DateTime.Now
             });
+
+            var recurringTransactions = await _repo.GetRecurringTransactionsByUserIdAsync(userId);
+            return new IncomeGeneratorResponse()
+            {
+                Id = generator.Id,
+                Description = generator.Description,
+                SalaryTypeId = generator.SalaryTypeId,
+                FrequencyId = generator.FrequencyId,
+                RecurringTransactions = CompileRecurringTransactions(generator.RecurringTransactions, recurringTransactions)
+            };
+        }
+
+        private IEnumerable<RecurringTransaction> CompileRecurringTransactions(IEnumerable<string> ids, IEnumerable<RecurringTransaction> recurringTransactions)
+        {
+            // This was making vscode all fucky when it was inline above.
+            return from id in ids
+                   from transaction in recurringTransactions
+                   where transaction.Id == id
+                   select transaction;
         }
 
         public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
