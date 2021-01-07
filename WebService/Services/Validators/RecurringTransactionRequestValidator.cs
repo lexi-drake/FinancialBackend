@@ -12,7 +12,7 @@ namespace WebService
             _repo = repo;
 
             RuleFor(x => x.Category).NotEmpty();
-            RuleFor(x => x.Description).NotEmpty();
+            // Description is optional.
             RuleFor(x => x.Amount).GreaterThan(0);
             RuleFor(x => x.FrequencyId)
                 .Cascade(CascadeMode.Stop)
