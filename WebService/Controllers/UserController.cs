@@ -39,21 +39,23 @@ namespace WebService.Controllers
         // This needs to be authorized so that it will return an error if the user
         // is _not_ logged in.
         [Authorize]
-        public ActionResult CheckLoggedIn()
+        public async Task<ActionResult<LoginResponse>> CheckLoggedIn()
         {
-            // If the request gets this far, it's in the clear.
-            return new OkResult();
+            var token = GetTokenFromCookie();
+            var loginResponse = await _service.GetUserAsync(token);
+            if (loginResponse is null)
+            {
+                return new NotFoundResult();
+            }
+            return new OkObjectResult(loginResponse);
         }
 
         [HttpGet]
         [Route("refresh")]
+        [Authorize]
         public async Task<ActionResult> RefreshToken()
         {
             var token = GetTokenFromCookie();
-            if (token is null)
-            {
-                return new UnauthorizedResult();
-            }
             var newToken = await _service.RefreshLoginAsync(token);
             SetCookies(newToken);
             return new OkResult();
@@ -78,10 +80,6 @@ namespace WebService.Controllers
         public async Task<ActionResult> LogoutUser()
         {
             var token = GetTokenFromCookie();
-            if (token is null)
-            {
-                return new NotFoundResult();
-            }
 
             ActionResult result = new OkResult();
             try

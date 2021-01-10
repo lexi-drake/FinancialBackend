@@ -22,6 +22,26 @@ namespace WebService
             _jwt = jwt;
         }
 
+        public async Task<LoginResponse> GetUserAsync(Token token)
+        {
+            var id = _jwt.GetUserIdFromToken(token.Jwt);
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+            var users = await _repo.GetUsersByIdAsync(id);
+            if (!users.Any())
+            {
+                return null;
+            }
+            var user = users.First();
+            return new LoginResponse()
+            {
+                Username = user.Username,
+                Role = user.Role
+            };
+        }
+
         public async Task<LoginResponse> CreateUserAsync(CreateUserRequest request)
         {
             var passwordHash = BC.HashPassword(request.Password);
