@@ -45,7 +45,7 @@ namespace WebService.Controllers
                 return new UnauthorizedResult();
             }
 
-            var entries = new OkObjectResult(await _service.GetLedgerEntriesBetweenDatesAsync(start, end, userId));
+            var entries = await _service.GetLedgerEntriesBetweenDatesAsync(start, end, userId);
             if (entries is null)
             {
                 // null is only returned if the dates aren't parsable
