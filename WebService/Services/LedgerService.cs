@@ -58,7 +58,7 @@ namespace WebService
                 UserId = userId,
                 Category = category.Category,
                 Description = request.Description,
-                Amount = request.Amount,
+                Amount = new Decimal(request.Amount),
                 TransactionTypeId = request.TransactionTypeId,
                 TransactionDate = request.TransactionDate,
                 CreatedDate = DateTime.Now
@@ -78,6 +78,7 @@ namespace WebService
         {
             var recurringTransactions = await _repo.GetRecurringTransactionsByUserIdAsync(userId);
             var generators = await _repo.GetIncomeGeneratorsByUserIdAsync(userId);
+            var transactionTypes = await _repo.GetAllAsync<TransactionType>();
 
             var responses = from generator in generators
                             select new IncomeGeneratorResponse()
@@ -86,7 +87,7 @@ namespace WebService
                                 Description = generator.Description,
                                 SalaryTypeId = generator.SalaryTypeId,
                                 FrequencyId = generator.FrequencyId,
-                                RecurringTransactions = CompileRecurringTransactions(generator.RecurringTransactions, recurringTransactions)
+                                RecurringTransactions = CompileRecurringTransactions(generator.RecurringTransactions, recurringTransactions, transactionTypes)
                             };
             return responses;
         }
@@ -115,23 +116,24 @@ namespace WebService
             });
 
             var recurringTransactions = await _repo.GetRecurringTransactionsByUserIdAsync(userId);
+            var transactionTypes = await _repo.GetAllAsync<TransactionType>();
             return new IncomeGeneratorResponse()
             {
                 Id = generator.Id,
                 Description = generator.Description,
                 SalaryTypeId = generator.SalaryTypeId,
                 FrequencyId = generator.FrequencyId,
-                RecurringTransactions = CompileRecurringTransactions(generator.RecurringTransactions, recurringTransactions)
+                RecurringTransactions = CompileRecurringTransactions(generator.RecurringTransactions, recurringTransactions, transactionTypes)
             };
         }
 
-        private IEnumerable<RecurringTransaction> CompileRecurringTransactions(IEnumerable<string> ids, IEnumerable<RecurringTransaction> recurringTransactions)
+        private IEnumerable<RecurringTransactionResponse> CompileRecurringTransactions(IEnumerable<string> ids, IEnumerable<RecurringTransaction> recurringTransactions, IEnumerable<TransactionType> transactionTypes)
         {
             // This was making vscode all fucky when it was inline above.
             return from id in ids
                    from transaction in recurringTransactions
                    where transaction.Id == id
-                   select transaction;
+                   select RecurringTransactionResponse.FromDBObject(transaction, transactionTypes);
         }
 
         public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
@@ -147,7 +149,7 @@ namespace WebService
                 UserId = userId,
                 Category = category.Category,
                 Description = request.Description,
-                Amount = request.Amount,
+                Amount = new Decimal(request.Amount),
                 FrequencyId = request.FrequencyId,
                 TransactionTypeId = request.TransactionTypeId,
                 CreatedDate = DateTime.Now

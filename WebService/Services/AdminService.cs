@@ -29,11 +29,16 @@ namespace WebService
             });
         }
 
-        public async Task UpdateUserRoleAsync(UpdateUserRoleRequest request)
+        public async Task UpdateUserRoleAsync(UpdateUserRoleRequest request, string userId)
         {
             // Validator ensures that a user exists with the provided username AND
             // that the role already exists.
-            var userId = (await _userRepo.GetUsersByUsernameAsync(request.Username)).First().Id;
+            var user = (await _userRepo.GetUsersByUsernameAsync(request.Username)).First();
+            if (user.Id == userId)
+            {
+                // Prevent a user from changing their own role.
+                return;
+            }
             await _userRepo.UpdateUserRoleAsync(userId, request.Role);
         }
 

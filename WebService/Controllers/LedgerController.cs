@@ -90,6 +90,30 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.AddIncomeGeneratorAsync(request, userId));
         }
 
+        [HttpGet]
+        [Route("recurringtransactions")]
+        public async Task<ActionResult<IEnumerable<RecurringTransactionResponse>>> GetRecurringTransactions()
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.GetRecurringTransactionsByUserIdAsync(userId));
+        }
+
+        [HttpPost]
+        [Route("recurringtransaction")]
+        public async Task<ActionResult<RecurringTransactionResponse>> AddRecurringTransaction([FromBody] RecurringTransactionRequest request)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            return new OkObjectResult(await _service.AddRecurringTransactionAsync(request, userId));
+        }
+
         [HttpPost]
         [Route("categories")]
         public async Task<ActionResult<IEnumerable<LedgerEntryCategory>>> GetLedgerEntryCategories([FromBody] CategoryCompleteRequest request)

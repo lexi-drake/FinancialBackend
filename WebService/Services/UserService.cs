@@ -8,7 +8,6 @@ namespace WebService
 {
     public class UserService : IUserService
     {
-        private const int SALT_SIZE = 32;
         // We always want to default the user to the role of User
         private const string USER_ROLE = "User";
         private readonly ILogger<UserService> _logger;

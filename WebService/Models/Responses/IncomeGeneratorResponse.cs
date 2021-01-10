@@ -8,6 +8,6 @@ namespace WebService
         public string Description { get; set; }
         public string SalaryTypeId { get; set; }
         public string FrequencyId { get; set; }
-        public IEnumerable<RecurringTransaction> RecurringTransactions { get; set; }
+        public IEnumerable<RecurringTransactionResponse> RecurringTransactions { get; set; }
     }
 }
