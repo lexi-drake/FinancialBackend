@@ -42,12 +42,8 @@ namespace WebService
         private DateTime FromMMDDYYYY(string date)
         {
             // This returns false in the case that date is null or empty.
-            var success = DateTime.TryParseExact(date, "MMDDYYYY", null, DateTimeStyles.None, out var parsedDate);
-            if (success)
-            {
-                return parsedDate;
-            }
-            return DateTime.MinValue;
+            DateTime.TryParseExact(date, "MMddyyyy", null, DateTimeStyles.None, out var parsedDate);
+            return parsedDate;
         }
 
         public async Task<LedgerEntryResponse> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
