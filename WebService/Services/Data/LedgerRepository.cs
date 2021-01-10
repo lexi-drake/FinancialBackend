@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -20,6 +21,16 @@ namespace WebService
         {
             var filter = Builders<LedgerEntry>.Filter.Eq(x => x.UserId, userId);
             return await _db.FindWithFilterAsync(filter);
+        }
+
+        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime start, DateTime end, string userId)
+        {
+            var builder = Builders<LedgerEntry>.Filter;
+            var userIdFilter = builder.Eq(x => x.UserId, userId);
+            var startFilter = builder.Gte(x => x.TransactionDate, start);
+            var endFilter = builder.Lte(x => x.TransactionDate, end);
+
+            return await _db.FindWithFilterAsync(userIdFilter & startFilter & endFilter);
         }
 
         public async Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntry entry)

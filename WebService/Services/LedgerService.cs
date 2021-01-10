@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
@@ -22,11 +23,27 @@ namespace WebService
             return await _repo.GetLedgerEntriesByUserIdAsync(userId);
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime startDate, DateTime endDate, string userId)
+        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(string start, string end, string userId)
         {
-            return from ledger in await _repo.GetLedgerEntriesByUserIdAsync(userId)
-                   where ledger.TransactionDate >= startDate && ledger.TransactionDate <= endDate
-                   select ledger;
+            var startDate = FromMMDDYYYY(start);
+            var endDate = FromMMDDYYYY(end);
+            if (startDate == DateTime.MinValue || endDate == DateTime.MinValue)
+            {
+                return null;
+            }
+
+            return await _repo.GetLedgerEntriesBetweenDatesAsync(startDate, endDate, userId);
+        }
+
+        private DateTime FromMMDDYYYY(string date)
+        {
+            // This returns false in the case that date is null or empty.
+            var success = DateTime.TryParseExact(date, "MMDDYYYY", null, DateTimeStyles.None, out var parsedDate);
+            if (success)
+            {
+                return parsedDate;
+            }
+            return DateTime.MinValue;
         }
 
         public async Task<LedgerEntry> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)

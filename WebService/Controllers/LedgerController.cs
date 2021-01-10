@@ -35,19 +35,23 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.GetLedgerEntriesByUserIdAsync(userId));
         }
 
-        // TODO (alexa): I don't like that this is a post request. This should
-        // absolutely be a get request, maybe something like /dates/{start}{end} 
-        // where start & end are MMDDYYYY? 
-        [HttpPost]
-        [Route("fordatespan")]
-        public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries([FromBody] DateSpanRequest request)
+        [HttpGet]
+        [Route("{start}/{end}")]
+        public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries(string start, string end)
         {
             var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.GetLedgerEntriesBetweenDatesAsync(request.StartDate, request.EndDate, userId));
+
+            var entries = new OkObjectResult(await _service.GetLedgerEntriesBetweenDatesAsync(start, end, userId));
+            if (entries is null)
+            {
+                // null is only returned if the dates aren't parsable
+                return new BadRequestResult();
+            }
+            return new OkObjectResult(entries);
         }
 
         [HttpPost]

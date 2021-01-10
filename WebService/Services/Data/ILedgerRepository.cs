@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,6 +7,7 @@ namespace WebService
     public interface ILedgerRepository
     {
         Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId);
+        Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime start, DateTime end, string userId);
         Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntry entry);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(string partial);
