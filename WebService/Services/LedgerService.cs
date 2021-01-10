@@ -35,8 +35,10 @@ namespace WebService
             }
 
             var transactionTypes = await _repo.GetAllAsync<TransactionType>();
-            return from entry in await _repo.GetLedgerEntriesBetweenDatesAsync(startDate, endDate, userId)
-                   select LedgerEntryResponse.FromDBObject(entry, transactionTypes);
+            var entries = from entry in await _repo.GetLedgerEntriesBetweenDatesAsync(startDate, endDate, userId)
+                          select LedgerEntryResponse.FromDBObject(entry, transactionTypes);
+            _logger.LogInformation($"Found {entries.Count()} entries for user {userId}");
+            return entries;
         }
 
         private DateTime FromMMDDYYYY(string date)
