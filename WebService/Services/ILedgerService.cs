@@ -6,9 +6,9 @@ namespace WebService
 {
     public interface ILedgerService
     {
-        Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId);
-        Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(string start, string end, string userId);
-        Task<LedgerEntry> AddLedgerEntryAsync(LedgerEntryRequest request, string userId);
+        Task<IEnumerable<LedgerEntryResponse>> GetLedgerEntriesByUserIdAsync(string userId);
+        Task<IEnumerable<LedgerEntryResponse>> GetLedgerEntriesBetweenDatesAsync(string start, string end, string userId);
+        Task<LedgerEntryResponse> AddLedgerEntryAsync(LedgerEntryRequest request, string userId);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(CategoryCompleteRequest request);
         Task<IEnumerable<IncomeGeneratorResponse>> GetIncomeGeneratorsByUserIdAsync(string userId);
         Task<IncomeGeneratorResponse> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId);

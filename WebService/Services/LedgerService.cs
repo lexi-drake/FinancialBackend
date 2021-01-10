@@ -18,12 +18,14 @@ namespace WebService
             _repo = repo;
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId)
+        public async Task<IEnumerable<LedgerEntryResponse>> GetLedgerEntriesByUserIdAsync(string userId)
         {
-            return await _repo.GetLedgerEntriesByUserIdAsync(userId);
+            var transactionTypes = await _repo.GetAllAsync<TransactionType>();
+            return from entry in await _repo.GetLedgerEntriesByUserIdAsync(userId)
+                   select LedgerEntryResponse.FromDBObject(entry, transactionTypes);
         }
 
-        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(string start, string end, string userId)
+        public async Task<IEnumerable<LedgerEntryResponse>> GetLedgerEntriesBetweenDatesAsync(string start, string end, string userId)
         {
             var startDate = FromMMDDYYYY(start);
             var endDate = FromMMDDYYYY(end);
@@ -32,7 +34,9 @@ namespace WebService
                 return null;
             }
 
-            return await _repo.GetLedgerEntriesBetweenDatesAsync(startDate, endDate, userId);
+            var transactionTypes = await _repo.GetAllAsync<TransactionType>();
+            return from entry in await _repo.GetLedgerEntriesBetweenDatesAsync(startDate, endDate, userId)
+                   select LedgerEntryResponse.FromDBObject(entry, transactionTypes);
         }
 
         private DateTime FromMMDDYYYY(string date)
@@ -46,24 +50,27 @@ namespace WebService
             return DateTime.MinValue;
         }
 
-        public async Task<LedgerEntry> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
+        public async Task<LedgerEntryResponse> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
         {
-            var categoryId = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
-            return await _repo.InsertLedgerEntryAsync(new LedgerEntry()
+            var category = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
+            var entry = await _repo.InsertLedgerEntryAsync(new LedgerEntry()
             {
                 UserId = userId,
-                CategoryId = categoryId,
+                Category = category.Category,
                 Description = request.Description,
                 Amount = request.Amount,
                 TransactionTypeId = request.TransactionTypeId,
                 TransactionDate = request.TransactionDate,
                 CreatedDate = DateTime.Now
             });
+
+            var transactionTypes = await _repo.GetAllAsync<TransactionType>();
+            return LedgerEntryResponse.FromDBObject(entry, transactionTypes);
         }
 
         public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(CategoryCompleteRequest request)
         {
-            var regex = $".*{request.Partial}.*";
+            var regex = $"^.*{request.Partial}.*";  // The ^ at the beginning should let this request use the index
             return await _repo.GetLedgerEntryCategoriesLikeAsync(regex);
         }
 
@@ -134,11 +141,11 @@ namespace WebService
 
         public async Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
         {
-            var categoryId = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
+            var category = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
             return await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
             {
                 UserId = userId,
-                CategoryId = categoryId,
+                Category = category.Category,
                 Description = request.Description,
                 Amount = request.Amount,
                 FrequencyId = request.FrequencyId,
@@ -147,16 +154,16 @@ namespace WebService
             });
         }
 
-        private async Task<string> GetOrInsertLedgerEntryCategoryAsync(string category)
+        private async Task<LedgerEntryCategory> GetOrInsertLedgerEntryCategoryAsync(string category)
         {
-            var categoryIds = from c in await _repo.GetLedgerEntryCategoriesByCategoryAsync(category)
-                              where c.Category.Equals(category, StringComparison.InvariantCultureIgnoreCase)
-                              select c.Id;
+            var categories = from c in await _repo.GetLedgerEntryCategoriesByCategoryAsync(category)
+                             where c.Category.Equals(category, StringComparison.InvariantCultureIgnoreCase)
+                             select c;
 
-            if (categoryIds.Any())
+            if (categories.Any())
             {
                 // If we already have this category in the database, use the existing id
-                return categoryIds.First();
+                return categories.First();
             }
             else
             {
@@ -167,7 +174,7 @@ namespace WebService
                     Category = category,
                     CreatedDate = DateTime.Now
                 });
-                return ledgerEntryCategory.Id;
+                return ledgerEntryCategory;
             }
         }
 

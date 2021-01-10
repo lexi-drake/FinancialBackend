@@ -25,7 +25,7 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries()
+        public async Task<ActionResult<IEnumerable<LedgerEntryResponse>>> GetLegerEntries()
         {
             var userId = GetUserIdFromCookie();
             if (userId is null)
@@ -37,7 +37,7 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("{start}/{end}")]
-        public async Task<ActionResult<IEnumerable<LedgerEntry>>> GetLegerEntries(string start, string end)
+        public async Task<ActionResult<IEnumerable<LedgerEntryResponse>>> GetLegerEntries(string start, string end)
         {
             var userId = GetUserIdFromCookie();
             if (userId is null)
@@ -56,7 +56,7 @@ namespace WebService.Controllers
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<LedgerEntry>> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
+        public async Task<ActionResult<LedgerEntryResponse>> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
         {
             var userId = GetUserIdFromCookie();
             if (userId is null)
