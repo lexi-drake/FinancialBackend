@@ -52,7 +52,6 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("refresh")]
-        [Authorize]
         public async Task<ActionResult> RefreshToken()
         {
             var token = GetTokenFromCookie();
