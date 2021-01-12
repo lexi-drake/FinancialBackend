@@ -14,6 +14,12 @@ namespace WebService
             _db = new MongoClient(connectionString).GetDatabase(database);
         }
 
+        public async Task<long> GetUserCountAsync()
+        {
+            var filter = Builders<User>.Filter.Eq(x => x.Role, "User");
+            return await _db.GetCollection<User>().CountDocumentsAsync(filter);
+        }
+
         public async Task<IEnumerable<User>> GetUsersByIdAsync(string userId)
         {
             var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
@@ -40,9 +46,21 @@ namespace WebService
             await _db.GetCollection<User>().UpdateOneAsync(filter, update);
         }
 
-        public async Task UpdateUsernameAsync(string userId, string username, IEnumerable<UsernameChangeData> changeDatas)
+        public async Task UpdateUserLastLoggedInAsync(string userId, DateTime lastLoggedIn)
         {
-            throw new NotImplementedException();
+            var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
+            var update = Builders<User>.Update.Set(x => x.LastLoggedIn, lastLoggedIn);
+
+            await _db.GetCollection<User>().UpdateOneAsync(filter, update);
+        }
+
+        public async Task<long> UpdateUsernameAsync(string userId, string username)
+        {
+            var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
+            var update = Builders<User>.Update.Set(x => x.Username, username);
+
+            var updated = await _db.GetCollection<User>().UpdateOneAsync(filter, update);
+            return updated.ModifiedCount;
         }
 
         public async Task<IEnumerable<RefreshData>> GetRefreshDataByUserIdAsync(string userId)

@@ -39,6 +39,15 @@ namespace WebService
             return entry;
         }
 
+        public async Task DeleteLedgerEntryAsync(string id, string userId)
+        {
+            var builder = Builders<LedgerEntry>.Filter;
+            var idFilter = builder.Eq(x => x.Id, id);
+            var userIdFilter = builder.Eq(x => x.UserId, userId);
+
+            await _db.GetCollection<LedgerEntry>().DeleteOneAsync(idFilter & userIdFilter);
+        }
+
         public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category)
         {
             var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Category, category);

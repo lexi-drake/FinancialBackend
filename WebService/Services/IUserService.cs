@@ -4,6 +4,7 @@ namespace WebService
 {
     public interface IUserService
     {
+        Task<UserCountResponse> GetUserCountAsync();
         Task<LoginResponse> GetUserAsync(Token token);
         Task<LoginResponse> CreateUserAsync(CreateUserRequest request);
         Task<LoginResponse> LoginUserAsync(LoginRequest request);

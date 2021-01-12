@@ -21,6 +21,14 @@ namespace WebService
             _jwt = jwt;
         }
 
+        public async Task<UserCountResponse> GetUserCountAsync()
+        {
+            return new UserCountResponse()
+            {
+                Count = (int)await _repo.GetUserCountAsync()
+            };
+        }
+
         public async Task<LoginResponse> GetUserAsync(Token token)
         {
             var id = _jwt.GetUserIdFromToken(token.Jwt);
@@ -76,6 +84,8 @@ namespace WebService
             {
                 return null;
             }
+
+            await _repo.UpdateUserLastLoggedInAsync(user.Id, DateTime.Now);
 
             var token = _jwt.CreateToken(user.Id, user.Role);
             await _repo.InsertRefreshDataAsync(new RefreshData()
@@ -149,7 +159,16 @@ namespace WebService
 
         public async Task<UpdateUsernameResponse> UpdateUsernameAsync(UpdateUsernameRequest request, Token token)
         {
-            throw new NotImplementedException();
+            var userId = _jwt.GetUserIdFromToken(token.Jwt);
+            var updated = await _repo.UpdateUsernameAsync(userId, request.Username);
+            if (updated == 0)
+            {
+                return null;
+            }
+            return new UpdateUsernameResponse()
+            {
+                Username = request.Username
+            };
         }
     }
 }

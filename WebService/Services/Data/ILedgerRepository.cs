@@ -9,6 +9,7 @@ namespace WebService
         Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId);
         Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime start, DateTime end, string userId);
         Task<LedgerEntry> InsertLedgerEntryAsync(LedgerEntry entry);
+        Task DeleteLedgerEntryAsync(string id, string userId);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category);
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(string partial);
         Task<LedgerEntryCategory> InsertLedgerEntryCategoryAsync(LedgerEntryCategory category);

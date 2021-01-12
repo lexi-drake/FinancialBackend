@@ -21,6 +21,13 @@ namespace WebService.Controllers
             _service = service;
         }
 
+        [HttpGet]
+        [Route("")]
+        public async Task<ActionResult<UserCountResponse>> GetUserCount()
+        {
+            return new OkObjectResult(await _service.GetUserCountAsync());
+        }
+
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult<LoginResponse>> LoginUser([FromBody] LoginRequest request)
@@ -98,9 +105,16 @@ namespace WebService.Controllers
 
         [HttpPost]
         [Route("edit/username")]
+        [Authorize]
         public async Task<ActionResult<UpdateUsernameResponse>> UpdateUsername([FromBody] UpdateUsernameRequest request)
         {
-            throw new NotImplementedException();
+            var token = GetTokenFromCookie();
+            var response = await _service.UpdateUsernameAsync(request, token);
+            if (response is null)
+            {
+                return new NotFoundResult();
+            }
+            return new OkObjectResult(response);
         }
 
         private void SetCookies(Token token)

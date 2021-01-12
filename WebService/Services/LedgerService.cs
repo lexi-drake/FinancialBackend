@@ -64,6 +64,11 @@ namespace WebService
             return LedgerEntryResponse.FromDBObject(entry, transactionTypes);
         }
 
+        public async Task DeleteLedgerEntryAsync(string id, string userId)
+        {
+            await _repo.DeleteLedgerEntryAsync(id, userId);
+        }
+
         public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(CategoryCompleteRequest request)
         {
             var regex = $"^.*{request.Partial}.*";  // The ^ at the beginning should let this request use the index

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -5,11 +6,13 @@ namespace WebService
 {
     public interface IUserRepository
     {
+        Task<long> GetUserCountAsync();
         Task<IEnumerable<User>> GetUsersByIdAsync(string userId);
         Task<IEnumerable<User>> GetUsersByUsernameAsync(string username);
         Task<User> InsertUserAsync(User user);
         Task UpdateUserRoleAsync(string userId, string role);
-        Task UpdateUsernameAsync(string userId, string username, IEnumerable<UsernameChangeData> changeDatas);
+        Task UpdateUserLastLoggedInAsync(string userId, DateTime lastLoggedIn);
+        Task<long> UpdateUsernameAsync(string userId, string username);
         Task<IEnumerable<RefreshData>> GetRefreshDataByUserIdAsync(string userId);
         Task<RefreshData> InsertRefreshDataAsync(RefreshData token);
         Task DeleteRefreshDataByIdAsync(string id);

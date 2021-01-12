@@ -66,6 +66,19 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.AddLedgerEntryAsync(request, userId));
         }
 
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<ActionResult> DeleteLedgerEntry(string id)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            await _service.DeleteLedgerEntryAsync(id, userId);
+            return new OkResult();
+        }
+
         [HttpGet]
         [Route("generators")]
         public async Task<ActionResult<IEnumerable<IncomeGeneratorResponse>>> GetIncomeGenerators()
