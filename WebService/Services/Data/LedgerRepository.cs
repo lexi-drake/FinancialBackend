@@ -57,6 +57,14 @@ namespace WebService
             return category;
         }
 
+        public async Task UpdateLedgerEntryCategoryLastUsedAsync(string id, DateTime lastUsed)
+        {
+            var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Id, id);
+            var update = Builders<LedgerEntryCategory>.Update.Set(x => x.LastUsed, lastUsed);
+
+            await _db.GetCollection<LedgerEntryCategory>().UpdateOneAsync(filter, update);
+        }
+
         public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId)
         {
             var filter = Builders<IncomeGenerator>.Filter.Eq(x => x.UserId, userId);

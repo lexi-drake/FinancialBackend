@@ -10,6 +10,7 @@ namespace WebService
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string Category { get; set; }
+        public DateTime LastUsed { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }

@@ -48,11 +48,11 @@ namespace WebService
 
         public async Task<LedgerEntryResponse> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
         {
-            var category = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
+            await UpdateOrInsertLedgerEntryCategoryAsync(request.Category);
             var entry = await _repo.InsertLedgerEntryAsync(new LedgerEntry()
             {
                 UserId = userId,
-                Category = category.Category,
+                Category = request.Category,
                 Description = request.Description,
                 Amount = new Decimal(request.Amount),
                 TransactionTypeId = request.TransactionTypeId,
@@ -139,11 +139,11 @@ namespace WebService
 
         public async Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
         {
-            var category = await GetOrInsertLedgerEntryCategoryAsync(request.Category);
+            await UpdateOrInsertLedgerEntryCategoryAsync(request.Category);
             return await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
             {
                 UserId = userId,
-                Category = category.Category,
+                Category = request.Category,
                 Description = request.Description,
                 Amount = new Decimal(request.Amount),
                 FrequencyId = request.FrequencyId,
@@ -152,7 +152,7 @@ namespace WebService
             });
         }
 
-        private async Task<LedgerEntryCategory> GetOrInsertLedgerEntryCategoryAsync(string category)
+        private async Task UpdateOrInsertLedgerEntryCategoryAsync(string category)
         {
             var categories = from c in await _repo.GetLedgerEntryCategoriesByCategoryAsync(category)
                              where c.Category.Equals(category, StringComparison.InvariantCultureIgnoreCase)
@@ -160,19 +160,19 @@ namespace WebService
 
             if (categories.Any())
             {
-                // If we already have this category in the database, use the existing id
-                return categories.First();
+                // If we already have this category in the database, use the existing id.
+                await _repo.UpdateLedgerEntryCategoryLastUsedAsync(categories.First().Id, DateTime.Now);
             }
             else
             {
                 // If we don't have this category in the database, insert a new category
                 // and use its id
-                var ledgerEntryCategory = await _repo.InsertLedgerEntryCategoryAsync(new LedgerEntryCategory()
+                await _repo.InsertLedgerEntryCategoryAsync(new LedgerEntryCategory()
                 {
                     Category = category,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.Now,
+                    LastUsed = DateTime.Now
                 });
-                return ledgerEntryCategory;
             }
         }
 
