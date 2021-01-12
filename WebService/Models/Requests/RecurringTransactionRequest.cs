@@ -9,5 +9,6 @@ namespace WebService
         public float Amount { get; set; }
         public string FrequencyId { get; set; }
         public string TransactionTypeId { get; set; }
+        public DateTime LastTriggered { get; set; }
     }
 }

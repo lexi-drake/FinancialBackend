@@ -153,6 +153,8 @@ namespace WebService
                 Amount = new Decimal(request.Amount),
                 FrequencyId = request.FrequencyId,
                 TransactionTypeId = request.TransactionTypeId,
+                LastTriggered = request.LastTriggered,
+                LastExecuted = request.LastTriggered,
                 CreatedDate = DateTime.Now
             });
         }
