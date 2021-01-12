@@ -74,6 +74,12 @@ namespace WebService
             await _db.GetCollection<LedgerEntryCategory>().UpdateOneAsync(filter, update);
         }
 
+        public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByIdAsync(string id)
+        {
+            var filter = Builders<IncomeGenerator>.Filter.Eq(x => x.Id, id);
+            return await _db.FindWithFilterAsync(filter);
+        }
+
         public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByUserIdAsync(string userId)
         {
             var filter = Builders<IncomeGenerator>.Filter.Eq(x => x.UserId, userId);
@@ -94,6 +100,15 @@ namespace WebService
             await _db.GetCollection<IncomeGenerator>().UpdateOneAsync(filter, update);
         }
 
+        public async Task DeleteIncomeGeneratorAsync(string id, string userId)
+        {
+            var builder = Builders<IncomeGenerator>.Filter;
+            var idFilter = builder.Eq(x => x.Id, id);
+            var userIdFilter = builder.Eq(x => x.UserId, userId);
+
+            await _db.GetCollection<IncomeGenerator>().DeleteOneAsync(idFilter & userIdFilter);
+        }
+
         public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
         {
             var filter = Builders<RecurringTransaction>.Filter.Eq(x => x.UserId, userId);
@@ -104,6 +119,15 @@ namespace WebService
         {
             await _db.GetCollection<RecurringTransaction>().InsertOneAsync(transaction);
             return transaction;
+        }
+
+        public async Task DeleteRecurringTransactionAsync(string id, string userId)
+        {
+            var builder = Builders<RecurringTransaction>.Filter;
+            var idFilter = builder.Eq(x => x.Id, id);
+            var userIdFilter = builder.Eq(x => x.UserId, userId);
+
+            await _db.GetCollection<RecurringTransaction>().DeleteOneAsync(idFilter & userIdFilter);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem

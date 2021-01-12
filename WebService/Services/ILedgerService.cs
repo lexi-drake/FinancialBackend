@@ -12,8 +12,10 @@ namespace WebService
         Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(CategoryCompleteRequest request);
         Task<IEnumerable<IncomeGeneratorResponse>> GetIncomeGeneratorsByUserIdAsync(string userId);
         Task<IncomeGeneratorResponse> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId);
+        Task DeleteIncomeGeneratorAsync(string id, string userId);
         Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId);
         Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId);
+        Task DeleteRecurringTransactionAsync(string id, string userId);
         Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem;
     }
 }

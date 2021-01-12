@@ -137,6 +137,22 @@ namespace WebService
                    select RecurringTransactionResponse.FromDBObject(transaction, transactionTypes);
         }
 
+        public async Task DeleteIncomeGeneratorAsync(string id, string userId)
+        {
+            var generator = await _repo.GetIncomeGeneratorsByIdAsync(id);
+            if (!generator.Any())
+            {
+                return;
+            }
+
+            // Delete all recurring transactions associated with the IncomeGenerator
+            foreach (var transactionId in generator.First().RecurringTransactions)
+            {
+                await DeleteRecurringTransactionAsync(transactionId, userId);
+            }
+            await _repo.DeleteIncomeGeneratorAsync(id, userId);
+        }
+
         public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
         {
             return await _repo.GetRecurringTransactionsByUserIdAsync(userId);
@@ -157,6 +173,11 @@ namespace WebService
                 LastExecuted = request.LastTriggered,
                 CreatedDate = DateTime.Now
             });
+        }
+
+        public async Task DeleteRecurringTransactionAsync(string id, string userId)
+        {
+            await _repo.DeleteRecurringTransactionAsync(id, userId);
         }
 
         private async Task UpdateOrInsertLedgerEntryCategoryAsync(string category)

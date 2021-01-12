@@ -103,6 +103,19 @@ namespace WebService.Controllers
             return new OkObjectResult(await _service.AddIncomeGeneratorAsync(request, userId));
         }
 
+        [HttpDelete]
+        [Route("generator/{id}")]
+        public async Task<ActionResult> DeleteIncomeGenerator(string id)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            await _service.DeleteIncomeGeneratorAsync(id, userId);
+            return new OkResult();
+        }
+
         [HttpGet]
         [Route("recurringtransactions")]
         public async Task<ActionResult<IEnumerable<RecurringTransactionResponse>>> GetRecurringTransactions()
@@ -125,6 +138,19 @@ namespace WebService.Controllers
                 return new UnauthorizedResult();
             }
             return new OkObjectResult(await _service.AddRecurringTransactionAsync(request, userId));
+        }
+
+        [HttpDelete]
+        [Route("recurringtransaction/{id}")]
+        public async Task<ActionResult> DeleteRecurringTransaction(string id)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            await _service.DeleteRecurringTransactionAsync(id, userId);
+            return new OkResult();
         }
 
         [HttpPost]
