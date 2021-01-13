@@ -161,8 +161,7 @@ namespace WebService
         public async Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
         {
             await UpdateOrInsertLedgerEntryCategoryAsync(request.Category);
-            // TODO (alexa): insert LedgerEntry for transaction.
-            return await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
+            var recurringTransaction = await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
             {
                 UserId = userId,
                 Category = request.Category,
@@ -174,6 +173,16 @@ namespace WebService
                 LastExecuted = request.LastTriggered,
                 CreatedDate = DateTime.Now
             });
+            await AddLedgerEntryAsync(new LedgerEntryRequest()
+            {
+                Category = request.Category,
+                Description = request.Description,
+                Amount = request.Amount,
+                TransactionTypeId = request.TransactionTypeId,
+                RecurringTransactionId = recurringTransaction.Id,
+                TransactionDate = request.LastTriggered
+            }, userId);
+            return recurringTransaction;
         }
 
         public async Task DeleteRecurringTransactionAsync(string id, string userId)
