@@ -161,6 +161,7 @@ namespace WebService
         public async Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId)
         {
             await UpdateOrInsertLedgerEntryCategoryAsync(request.Category);
+            // TODO (alexa): insert LedgerEntry for transaction.
             return await _repo.InsertRecurringTransactionAsync(new RecurringTransaction()
             {
                 UserId = userId,

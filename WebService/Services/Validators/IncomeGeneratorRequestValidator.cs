@@ -5,13 +5,18 @@ namespace WebService
 {
     public class IncomeGeneratorRequestValidator : AbstractValidator<IncomeGeneratorRequest>
     {
+        private const int MAX_DESCRIPTION_LENGTH = 24;
+
         private ILedgerRepository _repo;
 
         public IncomeGeneratorRequestValidator(ILedgerRepository repo, IValidator<RecurringTransactionRequest> recurringTransactionValidator)
         {
             _repo = repo;
 
-            RuleFor(x => x.Description).NotEmpty();
+            RuleFor(x => x.Description)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .Must(description => description.Length <= MAX_DESCRIPTION_LENGTH).WithMessage($"Description must not exceed {MAX_DESCRIPTION_LENGTH} characters.");
             RuleFor(x => x.SalaryTypeId)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
@@ -34,7 +39,7 @@ namespace WebService
                 }).WithMessage("Frequency Id must be valid.");
             RuleFor(x => x.RecurringTransactions)
                 .Cascade(CascadeMode.Stop)
-                .NotNull()
+                .NotEmpty()
                 .MustAsync(async (transactions, cancellation) =>
                 {
                     foreach (var transaction in transactions)
