@@ -1,11 +1,9 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Xunit;
 using Moq;
 using FluentValidation;
-using FluentValidation.Results;
 using WebService;
 
 namespace Tests
