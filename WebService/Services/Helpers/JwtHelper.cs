@@ -46,7 +46,8 @@ namespace WebService
                     new Claim(ClaimTypes.Name, userid),
                     new Claim(ClaimTypes.Role, role)
                 }),
-                Expires = DateTime.Now.AddMinutes(LOGIN_MINUTES),
+                Expires = DateTime.UtcNow.AddMinutes(LOGIN_MINUTES),
+                NotBefore = DateTime.UtcNow,
                 Issuer = _issuer,
                 Audience = _audience,
                 SigningCredentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM)
@@ -109,7 +110,8 @@ namespace WebService
                 ValidIssuer = _issuer,
                 ValidateAudience = true,
                 ValidAudience = _audience,
-                ValidateLifetime = false
+                ValidateLifetime = false,
+                ClockSkew = TimeSpan.Zero
             };
             return new JwtSecurityTokenHandler().ValidateToken(jwt, parameters, out var securityToken);
         }
