@@ -29,7 +29,7 @@ namespace WebService
         {
             var startDate = FromMMDDYYYY(start);
             var endDate = FromMMDDYYYY(end);
-            if (startDate == DateTime.MinValue || endDate == DateTime.MinValue)
+            if (startDate == DateTime.MinValue || endDate == DateTime.MinValue || endDate < startDate)
             {
                 return null;
             }
@@ -41,7 +41,7 @@ namespace WebService
 
         private DateTime FromMMDDYYYY(string date)
         {
-            // This returns false in the case that date is null or empty.
+            // parsedDate will be DateTime.MinValue if parsing fails.
             DateTime.TryParseExact(date, "MMddyyyy", null, DateTimeStyles.None, out var parsedDate);
             return parsedDate;
         }
@@ -95,8 +95,6 @@ namespace WebService
 
         public async Task<IncomeGeneratorResponse> AddIncomeGeneratorAsync(IncomeGeneratorRequest request, string userId)
         {
-            // Validation ensures non-duplicate income generator
-
             // The transactions need to be inserted first, so that the is can be included
             // in the income generator. Also, LINQ doesn't allow 'await' in the select 
             // part of the query.
@@ -153,9 +151,11 @@ namespace WebService
             await _repo.DeleteIncomeGeneratorAsync(id, userId);
         }
 
-        public async Task<IEnumerable<RecurringTransaction>> GetRecurringTransactionsByUserIdAsync(string userId)
+        public async Task<IEnumerable<RecurringTransactionResponse>> GetRecurringTransactionsByUserIdAsync(string userId)
         {
-            return await _repo.GetRecurringTransactionsByUserIdAsync(userId);
+            var transactionTypes = await _repo.GetAllAsync<TransactionType>();
+            return from transaction in await _repo.GetRecurringTransactionsByUserIdAsync(userId)
+                   select RecurringTransactionResponse.FromDBObject(transaction, transactionTypes);
         }
 
         public async Task<RecurringTransaction> AddRecurringTransactionAsync(RecurringTransactionRequest request, string userId)

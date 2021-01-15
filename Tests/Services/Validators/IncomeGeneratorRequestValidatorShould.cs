@@ -8,15 +8,45 @@ using WebService;
 
 namespace Tests
 {
-    public class IncomeGeneratorRequestValidatorShould : IClassFixture<IncomeGeneratorReqeustValidatorTestFixture>
+    public class IncomeGeneratorRequestValidatorShould
     {
-        private IncomeGeneratorReqeustValidatorTestFixture _fixture;
+        private string _validSalaryTypeId = Guid.NewGuid().ToString();
+        private string _invalidSalaryTypeId = Guid.NewGuid().ToString();
+        private string _validFrequencyId = Guid.NewGuid().ToString();
+        private string _invalidFrequencyId = Guid.NewGuid().ToString();
+        private int _approxTimesPerYear = new Random().Next(1, 52);
+        private string _validTransactionTypeId = Guid.NewGuid().ToString();
+        private string _nvalidTransactionTypeId = Guid.NewGuid().ToString();
+        private RecurringTransactionRequest _validRecurringTransactionRequest;
+
         private IncomeGeneratorRequestValidator _validator;
 
-        public IncomeGeneratorRequestValidatorShould(IncomeGeneratorReqeustValidatorTestFixture fixture)
+        public IncomeGeneratorRequestValidatorShould()
         {
-            _fixture = fixture;
-            _validator = new IncomeGeneratorRequestValidator(_fixture.Repository, new RecurringTransactionRequestValidator(_fixture.Repository));
+            _validRecurringTransactionRequest = new RecurringTransactionRequest()
+            {
+                Category = Guid.NewGuid().ToString().Substring(0, 24),
+                Description = Guid.NewGuid().ToString().Substring(0, 24),
+                Amount = new Random().Next(1, 1000),
+                FrequencyId = _validFrequencyId,
+                TransactionTypeId = _validTransactionTypeId,
+                LastTriggered = DateTime.Now.AddDays(-(new Random().Next(1, 7)))
+            };
+            IEnumerable<SalaryType> salaryTypes = new List<SalaryType>() { new SalaryType() { Id = _validSalaryTypeId } };
+            IEnumerable<Frequency> frequencies = new List<Frequency>() { new Frequency() { Id = _validFrequencyId, ApproxTimesPerYear = _approxTimesPerYear } };
+            IEnumerable<TransactionType> transactionTypes = new List<TransactionType>() { new TransactionType() { Id = _validTransactionTypeId } };
+
+            var repository = new Mock<ILedgerRepository>();
+            // Setup for IncomeGeneratorRequestValidator
+            repository.Setup(x => x.GetAllAsync<SalaryType>())
+                .Returns(Task.FromResult(salaryTypes));
+            repository.Setup(x => x.GetAllAsync<Frequency>())
+                .Returns(Task.FromResult(frequencies));
+
+            // Setup for RecurringTransactionRequestValidator
+            repository.Setup(x => x.GetAllAsync<TransactionType>())
+                .Returns(Task.FromResult(transactionTypes));
+            _validator = new IncomeGeneratorRequestValidator(repository.Object, new RecurringTransactionRequestValidator(repository.Object));
         }
 
         [Theory]
@@ -62,7 +92,7 @@ namespace Tests
         public async Task FailsForInvalidSalaryTypeId()
         {
             var request = CreateIncomeGeneratorRequest();
-            request.SalaryTypeId = _fixture.InvalidSalaryTypeId;
+            request.SalaryTypeId = _invalidSalaryTypeId;
 
             var result = await _validator.ValidateAsync(request);
             AssertHelper.FailsWithMessage(result, "Salary Type Id must be valid.");
@@ -84,7 +114,7 @@ namespace Tests
         public async Task FailsForInvalidFrequencyId()
         {
             var request = CreateIncomeGeneratorRequest();
-            request.FrequencyId = _fixture.InvalidFrequencyId;
+            request.FrequencyId = _invalidFrequencyId;
 
             var result = await _validator.ValidateAsync(request);
             AssertHelper.FailsWithMessage(result, "Frequency Id must be valid.");
@@ -138,54 +168,10 @@ namespace Tests
             return new IncomeGeneratorRequest()
             {
                 Description = Guid.NewGuid().ToString().Substring(0, 24),
-                SalaryTypeId = _fixture.ValidSalaryTypeId,
-                FrequencyId = _fixture.ValidFrequencyId,
-                RecurringTransactions = new List<RecurringTransactionRequest>() { _fixture.ValidRecurringTransactionRequest }
+                SalaryTypeId = _validSalaryTypeId,
+                FrequencyId = _validFrequencyId,
+                RecurringTransactions = new List<RecurringTransactionRequest>() { _validRecurringTransactionRequest }
             };
-        }
-    }
-
-    public class IncomeGeneratorReqeustValidatorTestFixture
-    {
-        public string ValidSalaryTypeId { get; set; } = Guid.NewGuid().ToString();
-        public string InvalidSalaryTypeId { get; set; } = Guid.NewGuid().ToString();
-        public string ValidFrequencyId { get; set; } = Guid.NewGuid().ToString();
-        public string InvalidFrequencyId { get; set; } = Guid.NewGuid().ToString();
-        public int ApproxTimesPerYear { get; set; } = new Random().Next(1, 52);
-        public string ValidTransactionTypeId { get; set; } = Guid.NewGuid().ToString();
-        public string InvalidTransactionTypeId { get; set; } = Guid.NewGuid().ToString();
-        public RecurringTransactionRequest ValidRecurringTransactionRequest { get; set; }
-
-        public ILedgerRepository Repository { get; set; }
-
-        public IncomeGeneratorReqeustValidatorTestFixture()
-        {
-            ValidRecurringTransactionRequest = new RecurringTransactionRequest()
-            {
-                Category = Guid.NewGuid().ToString().Substring(0, 24),
-                Description = Guid.NewGuid().ToString().Substring(0, 24),
-                Amount = new Random().Next(1, 1000),
-                FrequencyId = ValidFrequencyId,
-                TransactionTypeId = ValidTransactionTypeId,
-                LastTriggered = DateTime.Now.AddDays(-(new Random().Next(1, 7)))
-            };
-            IEnumerable<SalaryType> salaryTypes = new List<SalaryType>() { new SalaryType() { Id = ValidSalaryTypeId } };
-            IEnumerable<Frequency> frequencies = new List<Frequency>() { new Frequency() { Id = ValidFrequencyId, ApproxTimesPerYear = ApproxTimesPerYear } };
-            IEnumerable<TransactionType> transactionTypes = new List<TransactionType>() { new TransactionType() { Id = ValidTransactionTypeId } };
-
-            var repository = new Mock<ILedgerRepository>();
-            // Setup for IncomeGeneratorRequestValidator
-            repository.Setup(x => x.GetAllAsync<SalaryType>())
-                .Returns(Task.FromResult(salaryTypes));
-            repository.Setup(x => x.GetAllAsync<Frequency>())
-                .Returns(Task.FromResult(frequencies));
-
-            // Setup for RecurringTransactionRequestValidator
-            repository.Setup(x => x.GetAllAsync<TransactionType>())
-                .Returns(Task.FromResult(transactionTypes));
-
-
-            Repository = repository.Object;
         }
     }
 }

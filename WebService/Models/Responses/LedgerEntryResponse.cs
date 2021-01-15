@@ -22,7 +22,6 @@ namespace WebService
                                where type.Id == ledgerEntry.TransactionTypeId
                                select type;
             // Handle the event that there isn't a matching transaction type very lightly.
-            // TODO (alexa): revisit this if this becomes more important.
             string description = transactions.Any() ? transactions.First().Description : "UNKNOWN";
             return new LedgerEntryResponse()
             {

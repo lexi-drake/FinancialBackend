@@ -39,7 +39,7 @@ namespace WebService
                 // Prevent a user from changing their own role.
                 return;
             }
-            await _userRepo.UpdateUserRoleAsync(userId, request.Role);
+            await _userRepo.UpdateUserRoleAsync(user.Id, request.Role);
         }
 
         public async Task<Frequency> AddFrequencyAsync(FrequencyRequest request, string userId)

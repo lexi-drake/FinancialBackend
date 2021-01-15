@@ -8,15 +8,25 @@ using WebService;
 
 namespace Tests
 {
-    public class CreateUserRequestValidatorShould : IClassFixture<CreateUserRequestValidatorTestFixture>
+    public class CreateUserRequestValidatorShould
     {
-        private CreateUserRequestValidatorTestFixture _fixture;
+        private string _usernameThatAlreadyExists = Guid.NewGuid().ToString();
+        private string _usernameThatDoesNotExist = Guid.NewGuid().ToString();
+
         private IValidator<CreateUserRequest> _validator;
 
-        public CreateUserRequestValidatorShould(CreateUserRequestValidatorTestFixture fixture)
+        public CreateUserRequestValidatorShould()
         {
-            _fixture = fixture;
-            _validator = new CreateUserRequestValidator(_fixture.Repository);
+            IEnumerable<User> users = new List<User>() { new User() { Username = _usernameThatAlreadyExists } };
+            IEnumerable<User> emptyUsers = new List<User>();
+
+            var repository = new Mock<IUserRepository>();
+            repository.Setup(x => x.GetUsersByUsernameAsync(_usernameThatAlreadyExists))
+                .Returns(Task.FromResult(users));
+            repository.Setup(x => x.GetUsersByUsernameAsync(_usernameThatDoesNotExist))
+                .Returns(Task.FromResult(emptyUsers));
+
+            _validator = new CreateUserRequestValidator(repository.Object);
         }
 
         [Theory]
@@ -47,7 +57,7 @@ namespace Tests
         public async Task FailForUsernameAlreadyExists()
         {
             var request = CreateCreateUserRequest();
-            request.Username = _fixture.UsernameThatAlreadyExists;
+            request.Username = _usernameThatAlreadyExists;
 
             var result = await _validator.ValidateAsync(request);
             AssertHelper.FailsWithMessage(result, "Username already exists.");
@@ -90,31 +100,9 @@ namespace Tests
         {
             return new CreateUserRequest()
             {
-                Username = _fixture.UsernameThatDoesNotExist,
+                Username = _usernameThatDoesNotExist,
                 Password = Guid.NewGuid().ToString()
             };
-        }
-    }
-
-    public class CreateUserRequestValidatorTestFixture
-    {
-        public string UsernameThatAlreadyExists { get; set; } = Guid.NewGuid().ToString();
-        public string UsernameThatDoesNotExist { get; set; } = Guid.NewGuid().ToString();
-
-        public IUserRepository Repository { get; set; }
-
-        public CreateUserRequestValidatorTestFixture()
-        {
-            IEnumerable<User> users = new List<User>() { new User() { Username = UsernameThatAlreadyExists } };
-            IEnumerable<User> emptyUsers = new List<User>();
-
-            var repository = new Mock<IUserRepository>();
-            repository.Setup(x => x.GetUsersByUsernameAsync(UsernameThatAlreadyExists))
-                .Returns(Task.FromResult(users));
-            repository.Setup(x => x.GetUsersByUsernameAsync(UsernameThatDoesNotExist))
-                .Returns(Task.FromResult(emptyUsers));
-
-            Repository = repository.Object;
         }
     }
 }
