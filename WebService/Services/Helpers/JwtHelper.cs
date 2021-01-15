@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace WebService
 {
-    public class JwtHelper
+    public class JwtHelper : IJwtHelper
     {
         private const int LOGIN_MINUTES = 10;
         private const int REFRESH_TOKEN_SIZE = 32;

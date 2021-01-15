@@ -43,7 +43,7 @@ namespace WebService
             var audience = Configuration["AUDIENCE"];
             var issuer = Configuration["ISSUER"];
             var secret = Configuration["JWT_SECRET"];
-            services.AddScoped<JwtHelper>(s => new JwtHelper(secret, issuer, audience));
+            services.AddScoped<IJwtHelper>(s => new JwtHelper(secret, issuer, audience));
             services.AddScoped<ILedgerService, LedgerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAdminService, AdminService>();

@@ -13,9 +13,9 @@ namespace WebService.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private IAdminService _service;
-        private JwtHelper _jwt;
+        private IJwtHelper _jwt;
 
-        public AdminController(ILogger<AdminController> logger, IAdminService service, JwtHelper jwt)
+        public AdminController(ILogger<AdminController> logger, IAdminService service, IJwtHelper jwt)
         {
             _logger = logger;
             _service = service;

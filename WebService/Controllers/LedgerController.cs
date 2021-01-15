@@ -14,9 +14,9 @@ namespace WebService.Controllers
     {
         private readonly ILogger<LedgerController> _logger;
         private ILedgerService _service;
-        private JwtHelper _jwt;
+        private IJwtHelper _jwt;
 
-        public LedgerController(ILogger<LedgerController> logger, ILedgerService service, JwtHelper jwt)
+        public LedgerController(ILogger<LedgerController> logger, ILedgerService service, IJwtHelper jwt)
         {
             _logger = logger;
             _service = service;

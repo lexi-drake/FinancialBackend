@@ -12,9 +12,9 @@ namespace WebService
         private const string USER_ROLE = "User";
         private readonly ILogger<UserService> _logger;
         private IUserRepository _repo;
-        private JwtHelper _jwt;
+        private IJwtHelper _jwt;
 
-        public UserService(ILogger<UserService> logger, IUserRepository repo, JwtHelper jwt)
+        public UserService(ILogger<UserService> logger, IUserRepository repo, IJwtHelper jwt)
         {
             _logger = logger;
             _repo = repo;
@@ -104,7 +104,7 @@ namespace WebService
 
         public async Task<Token> RefreshLoginAsync(Token token)
         {
-            if (!string.IsNullOrEmpty(token.Jwt) || string.IsNullOrEmpty(token.Refresh))
+            if (string.IsNullOrEmpty(token.Jwt) || string.IsNullOrEmpty(token.Refresh))
             {
                 return null;
             }
@@ -142,7 +142,7 @@ namespace WebService
 
         public async Task LogoutUserAsync(Token token)
         {
-            if (!string.IsNullOrEmpty(token.Jwt))
+            if (string.IsNullOrEmpty(token.Jwt))
             {
                 throw new ArgumentException("Cannot logout user with empty jwt token");
             }
