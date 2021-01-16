@@ -1,15 +1,15 @@
+using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore;
-using System.IO;
 
 namespace WebService
 {
     public class Program
     {
         private const string APPSETTINGS = "appsettings.json";
-
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -30,6 +30,13 @@ namespace WebService
                         // of appsettings.json
                         config.AddEnvironmentVariables();
                     }
-                }).UseStartup<Startup>();
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Information);
+                    logging.AddConsole();
+                })
+                .UseStartup<Startup>();
     }
 }
