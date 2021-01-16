@@ -48,6 +48,7 @@ namespace WebService
                 }),
                 Expires = DateTime.Now.AddMinutes(LOGIN_MINUTES),
                 NotBefore = DateTime.Now,
+                IssuedAt = DateTime.Now,
                 Issuer = _issuer,
                 Audience = _audience,
                 SigningCredentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM)
