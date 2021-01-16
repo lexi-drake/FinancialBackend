@@ -26,42 +26,42 @@ namespace Tests
             Assert.Null(token.Jwt);
             Assert.NotNull(token.Refresh);
         }
-        /*
-                [Fact]
-                public void ReturnsToken()
-                {
-                    var token = _jwt.CreateToken(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-                    Assert.NotNull(token);
-                    Assert.NotNull(token.Jwt);
-                    Assert.NotNull(token.Refresh);
-                }
-                [Fact]
-                public void GetsUserIdFromJwt()
-                {
-                    var userId = Guid.NewGuid().ToString();
 
-                    var token = _jwt.CreateToken(userId, Guid.NewGuid().ToString());
-                    Assert.NotNull(token);
-                    Assert.NotNull(token.Jwt);
+        [Fact]
+        public void ReturnsToken()
+        {
+            var token = _jwt.CreateToken(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            Assert.NotNull(token);
+            Assert.NotNull(token.Jwt);
+            Assert.NotNull(token.Refresh);
+        }
 
-                    var result = _jwt.GetUserIdFromToken(token.Jwt);
-                    Assert.NotNull(result);
-                    Assert.Equal(userId, result);
-                }
+        [Fact]
+        public void GetsUserIdFromJwt()
+        {
+            var userId = Guid.NewGuid().ToString();
 
-                [Fact]
-                public void GetsRoleFromJwt()
-                {
-                    var role = Guid.NewGuid().ToString();
+            var token = _jwt.CreateToken(userId, Guid.NewGuid().ToString());
+            Assert.NotNull(token);
+            Assert.NotNull(token.Jwt);
 
-                    var token = _jwt.CreateToken(Guid.NewGuid().ToString(), role);
-                    Assert.NotNull(token);
-                    Assert.NotNull(token.Jwt);
+            var result = _jwt.GetUserIdFromToken(token.Jwt);
+            Assert.NotNull(result);
+            Assert.Equal(userId, result);
+        }
 
-                    var result = _jwt.GetRoleFromToken(token.Jwt);
-                    Assert.NotNull(result);
-                    Assert.Equal(role, result);
-                }
-                        */
+        [Fact]
+        public void GetsRoleFromJwt()
+        {
+            var role = Guid.NewGuid().ToString();
+
+            var token = _jwt.CreateToken(Guid.NewGuid().ToString(), role);
+            Assert.NotNull(token);
+            Assert.NotNull(token.Jwt);
+
+            var result = _jwt.GetRoleFromToken(token.Jwt);
+            Assert.NotNull(result);
+            Assert.Equal(role, result);
+        }
     }
 }
