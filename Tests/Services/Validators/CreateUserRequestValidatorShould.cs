@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Xunit;
 using Moq;
-using FluentValidation;
 using WebService;
 
 namespace Tests
@@ -13,7 +12,7 @@ namespace Tests
         private string _usernameThatAlreadyExists = Guid.NewGuid().ToString();
         private string _usernameThatDoesNotExist = Guid.NewGuid().ToString();
 
-        private IValidator<CreateUserRequest> _validator;
+        private CreateUserRequestValidator _validator;
 
         public CreateUserRequestValidatorShould()
         {

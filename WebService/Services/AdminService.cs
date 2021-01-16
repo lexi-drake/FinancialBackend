@@ -18,16 +18,14 @@ namespace WebService
             _userRepo = userRepo;
         }
 
-        public async Task<UserRole> AddUserRoleAsync(UserRoleRequest request, string userId)
-        {
-            // Validator ensures non-duplicate role.
-            return await _userRepo.InsertUserRoleAsync(new UserRole()
+        // Validator ensures non-duplicate role.
+        public async Task<UserRole> AddUserRoleAsync(UserRoleRequest request, string userId) =>
+            await _userRepo.InsertUserRoleAsync(new UserRole()
             {
                 Description = request.Description,
                 CreatedBy = userId,
                 CreatedDate = DateTime.Now
             });
-        }
 
         public async Task UpdateUserRoleAsync(UpdateUserRoleRequest request, string userId)
         {
@@ -42,17 +40,16 @@ namespace WebService
             await _userRepo.UpdateUserRoleAsync(user.Id, request.Role);
         }
 
-        public async Task<Frequency> AddFrequencyAsync(FrequencyRequest request, string userId)
-        {
-            // Validator ensures non-duplicate frequency.
-            return await _ledgerRepo.InsertOneAsync(new Frequency()
+
+        // Validator ensures non-duplicate frequency.
+        public async Task<Frequency> AddFrequencyAsync(FrequencyRequest request, string userId) =>
+            await _ledgerRepo.InsertOneAsync(new Frequency()
             {
                 Description = request.Description,
                 ApproxTimesPerYear = request.ApproxTimesPerYear,
                 CreatedBy = userId,
                 CreatedDate = DateTime.Now
             });
-        }
 
         public async Task<SalaryType> AddSalaryTypeAsync(SalaryTypeRequest request, string userId)
         {
@@ -65,15 +62,13 @@ namespace WebService
             });
         }
 
-        public async Task<TransactionType> AddTransactionTypeAsync(TransactionTypeRequest request, string userId)
-        {
-            // Validator ensures non-duplicate type.
-            return await _ledgerRepo.InsertOneAsync(new TransactionType()
-            {
-                Description = request.Description,
-                CreatedBy = userId,
-                CreatedDate = DateTime.Now
-            });
-        }
+        // Validator ensures non-duplicate type.
+        public async Task<TransactionType> AddTransactionTypeAsync(TransactionTypeRequest request, string userId) =>
+             await _ledgerRepo.InsertOneAsync(new TransactionType()
+             {
+                 Description = request.Description,
+                 CreatedBy = userId,
+                 CreatedDate = DateTime.Now
+             });
     }
 }

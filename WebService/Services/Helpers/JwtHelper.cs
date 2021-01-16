@@ -86,18 +86,13 @@ namespace WebService
             var ids = principal.Claims;
             var claims = from id in ids
                          where id.Type == type
-                         select GetClaim(id);
+                         select id;
 
             if (!claims.Any())
             {
                 return null;
             }
             return claims.First();
-        }
-
-        private Claim GetClaim(Claim claim)
-        {
-            return claim;
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string jwt)

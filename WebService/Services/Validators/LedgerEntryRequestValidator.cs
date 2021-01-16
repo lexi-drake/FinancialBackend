@@ -6,13 +6,18 @@ namespace WebService
 {
     public class LedgerEntryRequestValidator : AbstractValidator<LedgerEntryRequest>
     {
+        private const int MAX_DESCRIPTION_LENGTH = 24;
         private ILedgerRepository _repo;
         public LedgerEntryRequestValidator(ILedgerRepository repo)
         {
             _repo = repo;
 
             RuleFor(x => x.Category).NotEmpty();
-            // Description is optional.
+            RuleFor(x => x.Description).Must(description =>
+            {
+                return string.IsNullOrEmpty(description) ? true : description.Length <= MAX_DESCRIPTION_LENGTH;
+
+            }).WithMessage($"Description must not exceed {MAX_DESCRIPTION_LENGTH} characters.");
             RuleFor(x => x.Amount).GreaterThan(0);
             RuleFor(x => x.TransactionTypeId)
                 .Cascade(CascadeMode.Stop)
