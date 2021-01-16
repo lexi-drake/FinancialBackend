@@ -87,7 +87,7 @@ namespace Tests
         {
             var response = await _service.GetUserCountAsync();
             Assert.NotNull(response);
-            Assert.Equal((int)_count, response.Count);
+            Assert.Equal(_count, response);
         }
 
         [Fact]

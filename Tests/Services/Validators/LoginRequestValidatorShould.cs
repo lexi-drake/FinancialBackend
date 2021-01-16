@@ -39,13 +39,11 @@ namespace Tests
             Assert.True(result.IsValid);
         }
 
-        private LoginRequest CreateLoginRequest()
-        {
-            return new LoginRequest()
+        private LoginRequest CreateLoginRequest() =>
+            new LoginRequest()
             {
                 Username = Guid.NewGuid().ToString(),
                 Password = Guid.NewGuid().ToString()
             };
-        }
     }
 }

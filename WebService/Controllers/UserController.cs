@@ -23,7 +23,7 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<UserCountResponse>> GetUserCount()
+        public async Task<ActionResult<long>> GetUserCount()
         {
             return new OkObjectResult(await _service.GetUserCountAsync());
         }

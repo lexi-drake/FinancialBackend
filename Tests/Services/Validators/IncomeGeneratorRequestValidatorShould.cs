@@ -163,15 +163,13 @@ namespace Tests
             Assert.True(result.IsValid);
         }
 
-        private IncomeGeneratorRequest CreateIncomeGeneratorRequest()
-        {
-            return new IncomeGeneratorRequest()
+        private IncomeGeneratorRequest CreateIncomeGeneratorRequest() =>
+            new IncomeGeneratorRequest()
             {
                 Description = Guid.NewGuid().ToString().Substring(0, 24),
                 SalaryTypeId = _validSalaryTypeId,
                 FrequencyId = _validFrequencyId,
                 RecurringTransactions = new List<RecurringTransactionRequest>() { _validRecurringTransactionRequest }
             };
-        }
     }
 }

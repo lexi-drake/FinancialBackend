@@ -64,10 +64,9 @@ namespace WebService
             return LedgerEntryResponse.FromDBObject(entry, transactionTypes);
         }
 
-        public async Task DeleteLedgerEntryAsync(string id, string userId)
-        {
+        public async Task DeleteLedgerEntryAsync(string id, string userId) =>
             await _repo.DeleteLedgerEntryAsync(id, userId);
-        }
+
 
         public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(CategoryCompleteRequest request)
         {
@@ -126,14 +125,13 @@ namespace WebService
             };
         }
 
-        private IEnumerable<RecurringTransactionResponse> CompileRecurringTransactions(IEnumerable<string> ids, IEnumerable<RecurringTransaction> recurringTransactions, IEnumerable<TransactionType> transactionTypes)
-        {
-            // This was making vscode all fucky when it was inline above.
-            return from id in ids
-                   from transaction in recurringTransactions
-                   where transaction.Id == id
-                   select RecurringTransactionResponse.FromDBObject(transaction, transactionTypes);
-        }
+        // This was making vscode all fucky when it was inline above.
+        private IEnumerable<RecurringTransactionResponse> CompileRecurringTransactions(IEnumerable<string> ids, IEnumerable<RecurringTransaction> recurringTransactions, IEnumerable<TransactionType> transactionTypes) =>
+             from id in ids
+             from transaction in recurringTransactions
+             where transaction.Id == id
+             select RecurringTransactionResponse.FromDBObject(transaction, transactionTypes);
+
 
         public async Task DeleteIncomeGeneratorAsync(string id, string userId)
         {
@@ -185,10 +183,9 @@ namespace WebService
             return recurringTransaction;
         }
 
-        public async Task DeleteRecurringTransactionAsync(string id, string userId)
-        {
+        public async Task DeleteRecurringTransactionAsync(string id, string userId) =>
             await _repo.DeleteRecurringTransactionAsync(id, userId);
-        }
+
 
         private async Task UpdateOrInsertLedgerEntryCategoryAsync(string category)
         {
@@ -214,9 +211,6 @@ namespace WebService
             }
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem
-        {
-            return await _repo.GetAllAsync<T>();
-        }
+        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : AbstractLedgerItem => await _repo.GetAllAsync<T>();
     }
 }

@@ -21,13 +21,7 @@ namespace WebService
             _jwt = jwt;
         }
 
-        public async Task<UserCountResponse> GetUserCountAsync()
-        {
-            return new UserCountResponse()
-            {
-                Count = (int)await _repo.GetUserCountAsync()
-            };
-        }
+        public async Task<long> GetUserCountAsync() => await _repo.GetUserCountAsync();
 
         public async Task<LoginResponse> GetUserAsync(Token token)
         {

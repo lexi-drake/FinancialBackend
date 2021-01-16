@@ -51,16 +51,16 @@ namespace WebService
                 CreatedDate = DateTime.Now
             });
 
-        public async Task<SalaryType> AddSalaryTypeAsync(SalaryTypeRequest request, string userId)
-        {
-            // Validator ensures non-duplicate type.
-            return await _ledgerRepo.InsertOneAsync(new SalaryType()
-            {
-                Description = request.Description,
-                CreatedBy = userId,
-                CreatedDate = DateTime.Now
-            });
-        }
+
+        // Validator ensures non-duplicate type.
+        public async Task<SalaryType> AddSalaryTypeAsync(SalaryTypeRequest request, string userId) =>
+             await _ledgerRepo.InsertOneAsync(new SalaryType()
+             {
+                 Description = request.Description,
+                 CreatedBy = userId,
+                 CreatedDate = DateTime.Now
+             });
+
 
         // Validator ensures non-duplicate type.
         public async Task<TransactionType> AddTransactionTypeAsync(TransactionTypeRequest request, string userId) =>

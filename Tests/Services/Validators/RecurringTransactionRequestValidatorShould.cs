@@ -146,9 +146,8 @@ namespace Tests
             AssertHelper.FailsWithMessage(result, "Last Triggered is outside of the reasonable window.");
         }
 
-        private RecurringTransactionRequest CreateRecurringTransactionRequest()
-        {
-            return new RecurringTransactionRequest()
+        private RecurringTransactionRequest CreateRecurringTransactionRequest() =>
+            new RecurringTransactionRequest()
             {
                 Category = Guid.NewGuid().ToString().Substring(0, 24),
                 Amount = new Random().Next(1, 1000),
@@ -156,6 +155,5 @@ namespace Tests
                 TransactionTypeId = _validTransactionTypeId,
                 LastTriggered = DateTime.Now.AddDays(-(new Random().Next(1, 7)))
             };
-        }
     }
 }

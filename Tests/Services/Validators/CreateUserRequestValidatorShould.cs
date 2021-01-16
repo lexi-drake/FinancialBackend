@@ -95,13 +95,11 @@ namespace Tests
         }
 
 
-        private CreateUserRequest CreateCreateUserRequest()
-        {
-            return new CreateUserRequest()
+        private CreateUserRequest CreateCreateUserRequest() =>
+            new CreateUserRequest()
             {
                 Username = _usernameThatDoesNotExist,
                 Password = Guid.NewGuid().ToString()
             };
-        }
     }
 }

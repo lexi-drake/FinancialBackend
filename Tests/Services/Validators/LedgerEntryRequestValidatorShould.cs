@@ -108,15 +108,13 @@ namespace Tests
             Assert.True(result.IsValid);
         }
 
-        private LedgerEntryRequest CreateLedgerEntryRequest()
-        {
-            return new LedgerEntryRequest()
+        private LedgerEntryRequest CreateLedgerEntryRequest() =>
+            new LedgerEntryRequest()
             {
                 Category = Guid.NewGuid().ToString(),
                 Amount = (float)new Random().NextDouble() + 1,
                 TransactionTypeId = _transactionType.Id,
                 TransactionDate = DateTime.Now.AddDays(-1)
             };
-        }
     }
 }
