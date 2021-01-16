@@ -59,10 +59,16 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("refresh")]
+        // Not authorized because the jwt will likely be expired when this 
+        // endpoint is targeted.
         public async Task<ActionResult> RefreshToken()
         {
             var token = GetTokenFromCookie();
             var newToken = await _service.RefreshLoginAsync(token);
+            if (newToken is null)
+            {
+                return new UnauthorizedResult();
+            }
             SetCookies(newToken);
             return new OkResult();
         }
@@ -135,10 +141,9 @@ namespace WebService.Controllers
 
         private Token GetTokenFromCookie()
         {
-            if (!HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt) || !HttpContext.Request.Cookies.TryGetValue("refresh", out var refresh))
-            {
-                return null;
-            }
+            HttpContext.Request.Cookies.TryGetValue("jwt", out var jwt);
+            HttpContext.Request.Cookies.TryGetValue("refresh", out var refresh);
+
             return new Token()
             {
                 Jwt = jwt,

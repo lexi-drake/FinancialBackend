@@ -46,8 +46,8 @@ namespace WebService
                     new Claim(ClaimTypes.Name, userid),
                     new Claim(ClaimTypes.Role, role)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(LOGIN_MINUTES),
-                NotBefore = DateTime.UtcNow,
+                Expires = DateTime.Now.AddMinutes(LOGIN_MINUTES),
+                NotBefore = DateTime.Now,
                 Issuer = _issuer,
                 Audience = _audience,
                 SigningCredentials = new SigningCredentials(GetSecurityKey(), SECURITY_ALGORITHM)
