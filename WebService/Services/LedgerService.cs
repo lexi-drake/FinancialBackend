@@ -3,16 +3,16 @@ using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace WebService
 {
     public class LedgerService : ILedgerService
     {
-        private ILogger<LedgerService> _logger;
+        private ILogger _logger;
         private ILedgerRepository _repo;
 
-        public LedgerService(ILogger<LedgerService> logger, ILedgerRepository repo)
+        public LedgerService(ILogger logger, ILedgerRepository repo)
         {
             _logger = logger;
             _repo = repo;

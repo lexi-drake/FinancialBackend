@@ -1,17 +1,17 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace WebService
 {
     public class AdminService : IAdminService
     {
-        private readonly ILogger<AdminService> _logger;
+        private readonly ILogger _logger;
         private ILedgerRepository _ledgerRepo;
         private IUserRepository _userRepo;
 
-        public AdminService(ILogger<AdminService> logger, ILedgerRepository ledgerRepo, IUserRepository userRepo)
+        public AdminService(ILogger logger, ILedgerRepository ledgerRepo, IUserRepository userRepo)
         {
             _logger = logger;
             _ledgerRepo = ledgerRepo;

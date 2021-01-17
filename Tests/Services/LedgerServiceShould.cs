@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Xunit;
 using Moq;
 using WebService;
@@ -120,7 +120,7 @@ namespace Tests
             _repo.Setup(x => x.GetIncomeGeneratorsByIdAsync(_generator.Id))
                 .Returns(Task.FromResult(incomeGenerators));
 
-            _service = new LedgerService(new Mock<ILogger<LedgerService>>().Object, _repo.Object);
+            _service = new LedgerService(new Mock<ILogger>().Object, _repo.Object);
         }
 
         [Fact]

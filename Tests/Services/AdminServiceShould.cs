@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Xunit;
 using Moq;
 using WebService;
@@ -52,7 +52,7 @@ namespace Tests
             _userRepo.Setup(x => x.GetUsersByUsernameAsync(_validUsername))
                 .Returns(Task.FromResult(users));
 
-            _service = new AdminService(new Mock<ILogger<AdminService>>().Object,
+            _service = new AdminService(new Mock<ILogger>().Object,
                 _ledgerRepo.Object,
                 _userRepo.Object);
         }

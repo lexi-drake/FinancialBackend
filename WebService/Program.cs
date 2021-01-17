@@ -2,8 +2,8 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore;
+using Serilog;
 
 namespace WebService
 {
@@ -17,6 +17,7 @@ namespace WebService
 
         public static IWebHostBuilder CreateHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureAppConfiguration((hostContext, config) =>
                 {
                     if (File.Exists(APPSETTINGS))
@@ -30,12 +31,6 @@ namespace WebService
                         // of appsettings.json
                         config.AddEnvironmentVariables();
                     }
-                })
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Information);
-                    logging.AddConsole();
                 })
                 .UseStartup<Startup>();
     }

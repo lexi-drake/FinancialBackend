@@ -2,8 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace WebService.Controllers
 {
@@ -12,10 +12,10 @@ namespace WebService.Controllers
     public class UserController : ControllerBase
     {
         private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, IsEssential = true };
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger _logger;
         private IUserService _service;
 
-        public UserController(ILogger<UserController> logger, IUserService service)
+        public UserController(ILogger logger, IUserService service)
         {
             _logger = logger;
             _service = service;

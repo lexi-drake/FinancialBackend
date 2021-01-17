@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 using BC = BCrypt.Net.BCrypt;
+using Serilog;
 using Xunit;
 using Moq;
 using WebService;
@@ -79,7 +79,7 @@ namespace Tests
             _jwt.Setup(x => x.GetRoleFromToken(_token.Jwt))
                 .Returns(_user.Role);
 
-            _service = new UserService(new Mock<ILogger<UserService>>().Object, _repo.Object, _jwt.Object);
+            _service = new UserService(new Mock<ILogger>().Object, _repo.Object, _jwt.Object);
         }
 
         [Fact]

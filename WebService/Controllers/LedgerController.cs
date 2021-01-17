@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace WebService.Controllers
 {
@@ -12,11 +12,11 @@ namespace WebService.Controllers
     [Authorize]
     public class LedgerController : ControllerBase
     {
-        private readonly ILogger<LedgerController> _logger;
+        private readonly ILogger _logger;
         private ILedgerService _service;
         private IJwtHelper _jwt;
 
-        public LedgerController(ILogger<LedgerController> logger, ILedgerService service, IJwtHelper jwt)
+        public LedgerController(ILogger logger, ILedgerService service, IJwtHelper jwt)
         {
             _logger = logger;
             _service = service;

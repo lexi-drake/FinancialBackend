@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Serilog;
 
 namespace WebService
 {
@@ -24,7 +25,6 @@ namespace WebService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Console.WriteLine("Configuring Services.");
             services.AddCors(options =>
             {
                 // AllowAnyOrigin is incompatible with AllowCredentials so we're just
@@ -39,7 +39,13 @@ namespace WebService
 
             services.AddMemoryCache();
             services.AddMvc().AddFluentValidation();
-            services.AddLogging();
+
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.File("./log.log")
+                .WriteTo.Console()
+                .CreateLogger();
+            services.AddScoped<ILogger>(s => logger);
 
             var audience = Configuration["AUDIENCE"];
             var issuer = Configuration["ISSUER"];

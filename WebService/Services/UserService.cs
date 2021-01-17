@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using BC = BCrypt.Net.BCrypt;
+using Serilog;
 
 namespace WebService
 {
@@ -10,11 +10,11 @@ namespace WebService
     {
         // We always want to default the user to the role of User
         private const string USER_ROLE = "User";
-        private readonly ILogger<UserService> _logger;
+        private readonly ILogger _logger;
         private IUserRepository _repo;
         private IJwtHelper _jwt;
 
-        public UserService(ILogger<UserService> logger, IUserRepository repo, IJwtHelper jwt)
+        public UserService(ILogger logger, IUserRepository repo, IJwtHelper jwt)
         {
             _logger = logger;
             _repo = repo;
@@ -129,7 +129,7 @@ namespace WebService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.Error(ex.Message);
                 throw;
             }
         }

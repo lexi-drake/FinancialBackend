@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace WebService.Controllers
 {
@@ -11,11 +11,11 @@ namespace WebService.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly ILogger<AdminController> _logger;
+        private readonly ILogger _logger;
         private IAdminService _service;
         private IJwtHelper _jwt;
 
-        public AdminController(ILogger<AdminController> logger, IAdminService service, IJwtHelper jwt)
+        public AdminController(ILogger logger, IAdminService service, IJwtHelper jwt)
         {
             _logger = logger;
             _service = service;
