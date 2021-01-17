@@ -29,8 +29,9 @@ namespace WebService
             {
                 // AllowAnyOrigin is incompatible with AllowCredentials so we're just
                 // not checking origins.
+                var origins = Configuration["ORIGINS"].Split(',');
                 options.AddPolicy("allow",
-                builder => builder.WithOrigins(Configuration["ORIGINS"])
+                builder => builder.WithOrigins(origins)
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials()
