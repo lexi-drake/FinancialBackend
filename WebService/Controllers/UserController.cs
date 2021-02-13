@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -92,7 +93,6 @@ namespace WebService.Controllers
         public async Task<ActionResult> LogoutUser()
         {
             var token = GetTokenFromCookie();
-
             ActionResult result = new OkResult();
             try
             {
@@ -101,8 +101,8 @@ namespace WebService.Controllers
             }
             catch (ArgumentException ex)
             {
-                // We're not throwing the exception here because we want to propogate
-                // the error message to the front end instead of just sending a 500.
+                // Don't throw an exception here because we want to propogate the 
+                // error message to the front end instead of just sending a 500.
                 result = new UnauthorizedObjectResult(ex.Message);
             }
             ClearCookies();
@@ -116,6 +116,38 @@ namespace WebService.Controllers
         {
             var token = GetTokenFromCookie();
             var response = await _service.UpdateUsernameAsync(request, token);
+            if (response is null)
+            {
+                return new NotFoundResult();
+            }
+            return new OkObjectResult(response);
+        }
+
+        [HttpPost]
+        [Route("ticket")]
+        [Authorize]
+        public async Task<ActionResult> SubmitSupportTicket([FromBody] SupportTicketRequest request)
+        {
+            var token = GetTokenFromCookie();
+            ActionResult result = new OkResult();
+            try
+            {
+                await _service.SubmitSupportTicketAsync(request, token);
+            }
+            catch (ArgumentException ex)
+            {
+                result = new UnauthorizedObjectResult(ex.Message);
+            }
+            return result;
+        }
+
+        [HttpGet]
+        [Route("messages")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<MessageResponse>>> GetMessages()
+        {
+            var token = GetTokenFromCookie();
+            var response = await _service.GetMessagesAsync(token);
             if (response is null)
             {
                 return new NotFoundResult();

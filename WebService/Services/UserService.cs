@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BC = BCrypt.Net.BCrypt;
 using Serilog;
@@ -136,12 +137,11 @@ namespace WebService
 
         public async Task LogoutUserAsync(Token token)
         {
-            if (string.IsNullOrEmpty(token.Jwt))
+            var userId = _jwt.GetUserIdFromToken(token.Jwt);
+            if (userId is null)
             {
                 throw new ArgumentException("Cannot logout user with empty jwt token");
             }
-
-            var userId = _jwt.GetUserIdFromToken(token.Jwt);
 
             var ids = from data in await _repo.GetRefreshDataByUserIdAsync(userId)
                       select data.Id;
@@ -154,6 +154,11 @@ namespace WebService
         public async Task<UpdateUsernameResponse> UpdateUsernameAsync(UpdateUsernameRequest request, Token token)
         {
             var userId = _jwt.GetUserIdFromToken(token.Jwt);
+            if (userId is null)
+            {
+                return null;
+            }
+
             var updated = await _repo.UpdateUsernameAsync(userId, request.Username);
             if (updated == 0)
             {
@@ -163,6 +168,49 @@ namespace WebService
             {
                 Username = request.Username
             };
+        }
+
+        public async Task<IEnumerable<MessageResponse>> GetMessagesAsync(Token token)
+        {
+            var userId = _jwt.GetUserIdFromToken(token.Jwt);
+            if (userId is null)
+            {
+                return null;
+            }
+            return from message in await _repo.GetMessagesAsync(userId)
+                   select new MessageResponse()
+                   {
+                       TicketId = message.TicketId,
+                       Subject = message.Subject,
+                       Content = message.Content,
+                       Opened = message.Opened
+                   };
+        }
+
+        public async Task SubmitSupportTicketAsync(SupportTicketRequest request, Token token)
+        {
+            var userId = _jwt.GetUserIdFromToken(token.Jwt);
+            if (userId is null)
+            {
+                throw new ArgumentException("Invalid Jwt.");
+            }
+
+            var usernames = from user in await _repo.GetUsersByIdAsync(userId)
+                            select user.Username;
+            if (!usernames.Any())
+            {
+                throw new ArgumentException($"Username not found for id {userId}.");
+            }
+
+            var ticket = await _repo.InsertSupportTicketAsync(new SupportTicket()
+            {
+                SubmittingUserId = userId,
+                SubmittingUserName = usernames.First(),
+                Subject = request.Subject,
+                Content = request.Content,
+                Resolved = false,
+                CreatedDate = DateTime.Now
+            });
         }
     }
 }

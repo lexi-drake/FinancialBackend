@@ -7,6 +7,7 @@ namespace WebService
     public interface IUserRepository
     {
         Task<long> GetUserCountAsync();
+        Task<bool> UserExistsWithIdAsync(string userId);
         Task<IEnumerable<User>> GetUsersByIdAsync(string userId);
         Task<IEnumerable<User>> GetUsersByUsernameAsync(string username);
         Task<User> InsertUserAsync(User user);
@@ -18,5 +19,10 @@ namespace WebService
         Task DeleteRefreshDataByIdAsync(string id);
         Task<IEnumerable<UserRole>> GetUserRolesAsync();
         Task<UserRole> InsertUserRoleAsync(UserRole role);
+        Task<bool> SupportTicketExistsWithIdAsync(string id);
+        Task<IEnumerable<SupportTicket>> GetSupportTicketsAsync();
+        Task<SupportTicket> InsertSupportTicketAsync(SupportTicket ticket);
+        Task<IEnumerable<Message>> GetMessagesAsync(string userId);
+        Task<Message> InsertMessageAsync(Message message);
     }
 }

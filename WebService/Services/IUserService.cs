@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace WebService
@@ -11,5 +12,7 @@ namespace WebService
         Task<Token> RefreshLoginAsync(Token token);
         Task LogoutUserAsync(Token token);
         Task<UpdateUsernameResponse> UpdateUsernameAsync(UpdateUsernameRequest request, Token token);
+        Task<IEnumerable<MessageResponse>> GetMessagesAsync(Token token);
+        Task SubmitSupportTicketAsync(SupportTicketRequest request, Token token);
     }
 }

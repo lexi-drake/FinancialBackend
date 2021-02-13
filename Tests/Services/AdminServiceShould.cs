@@ -21,36 +21,39 @@ namespace Tests
         public AdminServiceShould()
         {
             IEnumerable<User> users = new List<User>() { new User() { Id = _userIdFromDbUser, Username = _validUsername } };
+            IEnumerable<SupportTicket> tickets = new List<SupportTicket>() { new SupportTicket() };
 
             _ledgerRepo = new Mock<ILedgerRepository>();
             _ledgerRepo.Setup(x => x.InsertOneAsync(It.IsAny<Frequency>()))
                 .Returns<Frequency>(frequency =>
-               {
-                   frequency.Id = Guid.NewGuid().ToString();
-                   return Task.FromResult(frequency);
-               });
+                {
+                    frequency.Id = Guid.NewGuid().ToString();
+                    return Task.FromResult(frequency);
+                });
             _ledgerRepo.Setup(x => x.InsertOneAsync(It.IsAny<SalaryType>()))
-             .Returns<SalaryType>(type =>
-            {
-                type.Id = Guid.NewGuid().ToString();
-                return Task.FromResult(type);
-            });
+                .Returns<SalaryType>(type =>
+                {
+                    type.Id = Guid.NewGuid().ToString();
+                    return Task.FromResult(type);
+                });
             _ledgerRepo.Setup(x => x.InsertOneAsync(It.IsAny<TransactionType>()))
-             .Returns<TransactionType>(type =>
-            {
-                type.Id = Guid.NewGuid().ToString();
-                return Task.FromResult(type);
-            });
+                .Returns<TransactionType>(type =>
+                {
+                    type.Id = Guid.NewGuid().ToString();
+                    return Task.FromResult(type);
+                });
 
             _userRepo = new Mock<IUserRepository>();
             _userRepo.Setup(x => x.InsertUserRoleAsync(It.IsAny<UserRole>()))
-                    .Returns<UserRole>(role =>
-                    {
-                        role.Id = Guid.NewGuid().ToString();
-                        return Task.FromResult(role);
-                    });
+                .Returns<UserRole>(role =>
+                {
+                    role.Id = Guid.NewGuid().ToString();
+                    return Task.FromResult(role);
+                });
             _userRepo.Setup(x => x.GetUsersByUsernameAsync(_validUsername))
                 .Returns(Task.FromResult(users));
+            _userRepo.Setup(x => x.GetSupportTicketsAsync())
+                .Returns(Task.FromResult(tickets));
 
             _service = new AdminService(new Mock<ILogger>().Object,
                 _ledgerRepo.Object,
@@ -60,14 +63,8 @@ namespace Tests
         [Fact]
         public async Task InsertsUserRole()
         {
-            var request = new UserRoleRequest() { Description = Guid.NewGuid().ToString() };
-
-            var role = await _service.AddUserRoleAsync(request, _userIdFromDbUser);
-            Assert.NotNull(role);
-            Assert.False(string.IsNullOrEmpty(role.Id));
-            Assert.Equal(request.Description, role.Description);
-            Assert.Equal(_userIdFromDbUser, role.CreatedBy);
-            Assert.NotNull(role.CreatedDate);
+            await _service.AddUserRoleAsync(new UserRoleRequest(), _userIdFromDbUser);
+            _userRepo.Verify(x => x.InsertUserRoleAsync(It.IsAny<UserRole>()), Times.Once);
         }
 
         [Fact]
@@ -102,48 +99,41 @@ namespace Tests
         [Fact]
         public async Task AddsFrequency()
         {
-            var request = new FrequencyRequest()
-            {
-                Description = Guid.NewGuid().ToString(),
-                ApproxTimesPerYear = new Random().Next(1, 52)
-            };
             var userId = Guid.NewGuid().ToString();
-
-            var frequency = await _service.AddFrequencyAsync(request, userId);
-            Assert.NotNull(frequency);
-            Assert.Equal(request.Description, frequency.Description);
-            Assert.Equal(request.ApproxTimesPerYear, frequency.ApproxTimesPerYear);
-            Assert.Equal(userId, frequency.CreatedBy);
+            await _service.AddFrequencyAsync(new FrequencyRequest(), userId);
+            _ledgerRepo.Verify(x => x.InsertOneAsync<Frequency>(It.IsAny<Frequency>()), Times.Once);
         }
 
         [Fact]
         public async Task AddSalaryType()
         {
-            var request = new SalaryTypeRequest()
-            {
-                Description = Guid.NewGuid().ToString()
-            };
             var userId = Guid.NewGuid().ToString();
-
-            var type = await _service.AddSalaryTypeAsync(request, userId);
-            Assert.NotNull(type);
-            Assert.Equal(request.Description, type.Description);
-            Assert.Equal(userId, type.CreatedBy);
+            await _service.AddSalaryTypeAsync(new SalaryTypeRequest(), userId);
+            _ledgerRepo.Verify(x => x.InsertOneAsync<SalaryType>(It.IsAny<SalaryType>()), Times.Once);
         }
 
         [Fact]
         public async Task AddTransactionType()
         {
-            var request = new TransactionTypeRequest()
-            {
-                Description = Guid.NewGuid().ToString()
-            };
             var userId = Guid.NewGuid().ToString();
+            await _service.AddTransactionTypeAsync(new TransactionTypeRequest(), userId);
+            _ledgerRepo.Verify(x => x.InsertOneAsync<TransactionType>(It.IsAny<TransactionType>()), Times.Once);
+        }
 
-            var type = await _service.AddTransactionTypeAsync(request, userId);
-            Assert.NotNull(type);
-            Assert.Equal(request.Description, type.Description);
-            Assert.Equal(userId, type.CreatedBy);
+        [Fact]
+        public async Task ReturnsTickets()
+        {
+            var tickets = await _service.GetSupportTicketsAsync();
+            Assert.NotNull(tickets);
+            Assert.Single(tickets);
+        }
+
+        [Fact]
+        public async Task InsertsMessage()
+        {
+            var userId = Guid.NewGuid().ToString();
+            await _service.AddMessageAsync(new MessageRequest(), userId);
+            _userRepo.Verify(x => x.InsertMessageAsync(It.IsAny<Message>()), Times.Once);
         }
     }
 }
