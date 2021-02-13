@@ -18,5 +18,9 @@ namespace WebService
         Task DeleteRefreshDataByIdAsync(string id);
         Task<IEnumerable<UserRole>> GetUserRolesAsync();
         Task<UserRole> InsertUserRoleAsync(UserRole role);
+        Task<IEnumerable<SupportTicket>> GetSupportTicketsAsync();
+        Task<SupportTicket> InsertSupportTicketAsync(SupportTicket ticket);
+        Task<IEnumerable<Message>> GetMessagesAsync(string userId);
+        Task<Message> InsertMessageAsync(Message message);
     }
 }

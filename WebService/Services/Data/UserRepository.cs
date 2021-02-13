@@ -91,5 +91,28 @@ namespace WebService
             await _db.GetCollection<UserRole>().InsertOneAsync(role);
             return role;
         }
+
+        public async Task<IEnumerable<SupportTicket>> GetSupportTicketsAsync()
+        {
+            return await _db.FindWithFilterAsync(FilterDefinition<SupportTicket>.Empty);
+        }
+
+        public async Task<SupportTicket> InsertSupportTicketAsync(SupportTicket ticket)
+        {
+            await _db.GetCollection<SupportTicket>().InsertOneAsync(ticket);
+            return ticket;
+        }
+
+        public async Task<IEnumerable<Message>> GetMessagesAsync(string userId)
+        {
+            var filter = Builders<Message>.Filter.Eq(x => x.RecipientId, userId);
+            return await _db.FindWithFilterAsync(filter);
+        }
+
+        public async Task<Message> InsertMessageAsync(Message message)
+        {
+            await _db.GetCollection<Message>().InsertOneAsync(message);
+            return message;
+        }
     }
 }

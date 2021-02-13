@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using BC = BCrypt.Net.BCrypt;
@@ -18,6 +19,7 @@ namespace Tests
         private string _invalidJwt = Guid.NewGuid().ToString();
         private string _invalidUserId = Guid.NewGuid().ToString();
         private string _invalidUsername = Guid.NewGuid().ToString();
+        private string _tickteId = Guid.NewGuid().ToString();
         private Mock<IUserRepository> _repo;
         private Mock<IJwtHelper> _jwt;
 
@@ -50,6 +52,12 @@ namespace Tests
             IEnumerable<User> users = new List<User>() { _user };
             IEnumerable<User> noUsers = new List<User>();
             IEnumerable<RefreshData> refreshData = new List<RefreshData>() { refresh };
+            IEnumerable<Message> messages = new List<Message>() { new Message(){
+                TicketId = Guid.NewGuid().ToString(),
+                Subject = Guid.NewGuid().ToString(),
+                Content = Guid.NewGuid().ToString(),
+                Opened = false
+            }};
 
             _repo = new Mock<IUserRepository>();
             _repo.Setup(x => x.GetUserCountAsync())
@@ -68,6 +76,14 @@ namespace Tests
                 .Returns(Task.FromResult(0L));
             _repo.Setup(x => x.UpdateUsernameAsync(_user.Id, _user.Username))
                 .Returns(Task.FromResult(1L));
+            _repo.Setup(x => x.GetMessagesAsync(_user.Id))
+                .Returns(Task.FromResult(messages));
+            _repo.Setup(x => x.InsertSupportTicketAsync(It.IsAny<SupportTicket>()))
+                .Returns<SupportTicket>(ticket =>
+                {
+                    ticket.Id = _tickteId;
+                    return Task.FromResult(ticket);
+                });
 
             _jwt = new Mock<IJwtHelper>();
             _jwt.Setup(x => x.GetUserIdFromToken(_token.Jwt))
@@ -212,6 +228,27 @@ namespace Tests
             var response = await _service.UpdateUsernameAsync(request, _token);
             Assert.NotNull(response);
             Assert.Equal(request.Username, response.Username);
+        }
+
+        [Fact]
+        public async Task ReturnsMessagesForUser()
+        {
+            var response = await _service.GetMessagesAsync(_token);
+            Assert.NotNull(response);
+            Assert.Single(response);
+
+            var message = response.First();
+            Assert.NotNull(message.TicketId);
+            Assert.NotNull(message.Subject);
+            Assert.NotNull(message.Content);
+        }
+
+        [Fact]
+        public async Task InsertsSupportTicket()
+        {
+            var response = await _service.SubmitSupportTicketAsync(new SupportTicketRequest(), _token);
+            Assert.NotNull(response);
+            Assert.Equal(_tickteId, response.Id);
         }
     }
 }
