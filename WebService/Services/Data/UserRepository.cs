@@ -20,6 +20,13 @@ namespace WebService
             return await _db.GetCollection<User>().CountDocumentsAsync(filter);
         }
 
+        public async Task<bool> UserExistsWithIdAsync(string userId)
+        {
+            var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
+            var count = await _db.GetCollection<User>().CountDocumentsAsync(filter);
+            return count > 0;
+        }
+
         public async Task<IEnumerable<User>> GetUsersByIdAsync(string userId)
         {
             var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
@@ -90,6 +97,13 @@ namespace WebService
         {
             await _db.GetCollection<UserRole>().InsertOneAsync(role);
             return role;
+        }
+
+        public async Task<bool> SupportTicketExistsWithIdAsync(string id)
+        {
+            var filter = Builders<SupportTicket>.Filter.Eq(x => x.Id, id);
+            var count = await _db.GetCollection<SupportTicket>().CountDocumentsAsync(filter);
+            return count > 0;
         }
 
         public async Task<IEnumerable<SupportTicket>> GetSupportTicketsAsync()
