@@ -187,23 +187,30 @@ namespace WebService
                    };
         }
 
-        public async Task<SubmitSupportTicketResponse> SubmitSupportTicketAsync(SupportTicketRequest request, Token token)
+        public async Task SubmitSupportTicketAsync(SupportTicketRequest request, Token token)
         {
             var userId = _jwt.GetUserIdFromToken(token.Jwt);
             if (userId is null)
             {
-                return null;
+                throw new ArgumentException("Invalid Jwt.");
+            }
+
+            var usernames = from user in await _repo.GetUsersByIdAsync(userId)
+                            select user.Username;
+            if (!usernames.Any())
+            {
+                throw new ArgumentException($"Username not found for id {userId}.");
             }
 
             var ticket = await _repo.InsertSupportTicketAsync(new SupportTicket()
             {
                 SubmittingUserId = userId,
+                SubmittingUserName = usernames.First(),
                 Subject = request.Subject,
                 Content = request.Content,
                 Resolved = false,
                 CreatedDate = DateTime.Now
             });
-            return new SubmitSupportTicketResponse() { Id = ticket.Id };
         }
     }
 }

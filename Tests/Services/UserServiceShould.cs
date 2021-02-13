@@ -246,9 +246,8 @@ namespace Tests
         [Fact]
         public async Task InsertsSupportTicket()
         {
-            var response = await _service.SubmitSupportTicketAsync(new SupportTicketRequest(), _token);
-            Assert.NotNull(response);
-            Assert.Equal(_tickteId, response.Id);
+            await _service.SubmitSupportTicketAsync(new SupportTicketRequest(), _token);
+            _repo.Verify(x => x.InsertSupportTicketAsync(It.IsAny<SupportTicket>()), Times.Once);
         }
     }
 }

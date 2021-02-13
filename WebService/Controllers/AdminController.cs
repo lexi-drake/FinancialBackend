@@ -1,4 +1,4 @@
-
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +32,7 @@ namespace WebService.Controllers
 
         [HttpPost]
         [Route("frequency")]
-        public async Task<ActionResult<Frequency>> AddFrequency([FromBody] FrequencyRequest request)
+        public async Task<ActionResult> AddFrequency([FromBody] FrequencyRequest request)
         {
 
             var userId = GetUserIdFromCookie();
@@ -40,24 +40,26 @@ namespace WebService.Controllers
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddFrequencyAsync(request, userId));
+            await _service.AddFrequencyAsync(request, userId);
+            return new OkResult();
         }
 
         [HttpPost]
         [Route("salarytype")]
-        public async Task<ActionResult<SalaryType>> AddSalaryType([FromBody] SalaryTypeRequest request)
+        public async Task<ActionResult> AddSalaryType([FromBody] SalaryTypeRequest request)
         {
             var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddSalaryTypeAsync(request, userId));
+            await _service.AddSalaryTypeAsync(request, userId);
+            return new OkResult();
         }
 
         [HttpPost]
         [Route("transactiontype")]
-        public async Task<ActionResult<TransactionType>> AddTransactionType([FromBody] TransactionTypeRequest request)
+        public async Task<ActionResult> AddTransactionType([FromBody] TransactionTypeRequest request)
         {
 
             var userId = GetUserIdFromCookie();
@@ -65,19 +67,21 @@ namespace WebService.Controllers
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddTransactionTypeAsync(request, userId));
+            await _service.AddTransactionTypeAsync(request, userId);
+            return new OkResult();
         }
 
         [HttpPost]
         [Route("role")]
-        public async Task<ActionResult<UserRole>> CreateUserRole([FromBody] UserRoleRequest request)
+        public async Task<ActionResult> CreateUserRole([FromBody] UserRoleRequest request)
         {
             var userId = GetUserIdFromCookie();
             if (userId is null)
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddUserRoleAsync(request, userId));
+            await _service.AddUserRoleAsync(request, userId);
+            return new OkResult();
         }
 
         [HttpPost]
@@ -90,6 +94,26 @@ namespace WebService.Controllers
                 return new UnauthorizedResult();
             }
             await _service.UpdateUserRoleAsync(request, userId);
+            return new OkResult();
+        }
+
+        [HttpGet]
+        [Route("tickets")]
+        public async Task<ActionResult<IEnumerable<SupportTicketResponse>>> GetTickets()
+        {
+            return new OkObjectResult(await _service.GetSupportTicketsAsync());
+        }
+
+        [HttpPost]
+        [Route("message")]
+        public async Task<ActionResult> SubmitMessage([FromBody] MessageRequest request)
+        {
+            var userId = GetUserIdFromCookie();
+            if (userId is null)
+            {
+                return new UnauthorizedResult();
+            }
+            await _service.AddMessageAsync(request, userId);
             return new OkResult();
         }
 

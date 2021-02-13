@@ -13,6 +13,6 @@ namespace WebService
         Task LogoutUserAsync(Token token);
         Task<UpdateUsernameResponse> UpdateUsernameAsync(UpdateUsernameRequest request, Token token);
         Task<IEnumerable<MessageResponse>> GetMessagesAsync(Token token);
-        Task<SubmitSupportTicketResponse> SubmitSupportTicketAsync(SupportTicketRequest request, Token token);
+        Task SubmitSupportTicketAsync(SupportTicketRequest request, Token token);
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
 
@@ -19,7 +20,7 @@ namespace WebService
         }
 
         // Validator ensures non-duplicate role.
-        public async Task<UserRole> AddUserRoleAsync(UserRoleRequest request, string userId) =>
+        public async Task AddUserRoleAsync(UserRoleRequest request, string userId) =>
             await _userRepo.InsertUserRoleAsync(new UserRole()
             {
                 Description = request.Description,
@@ -42,7 +43,7 @@ namespace WebService
 
 
         // Validator ensures non-duplicate frequency.
-        public async Task<Frequency> AddFrequencyAsync(FrequencyRequest request, string userId) =>
+        public async Task AddFrequencyAsync(FrequencyRequest request, string userId) =>
             await _ledgerRepo.InsertOneAsync(new Frequency()
             {
                 Description = request.Description,
@@ -53,7 +54,7 @@ namespace WebService
 
 
         // Validator ensures non-duplicate type.
-        public async Task<SalaryType> AddSalaryTypeAsync(SalaryTypeRequest request, string userId) =>
+        public async Task AddSalaryTypeAsync(SalaryTypeRequest request, string userId) =>
              await _ledgerRepo.InsertOneAsync(new SalaryType()
              {
                  Description = request.Description,
@@ -63,12 +64,37 @@ namespace WebService
 
 
         // Validator ensures non-duplicate type.
-        public async Task<TransactionType> AddTransactionTypeAsync(TransactionTypeRequest request, string userId) =>
+        public async Task AddTransactionTypeAsync(TransactionTypeRequest request, string userId) =>
              await _ledgerRepo.InsertOneAsync(new TransactionType()
              {
                  Description = request.Description,
                  CreatedBy = userId,
                  CreatedDate = DateTime.Now
              });
+
+        public async Task<IEnumerable<SupportTicketResponse>> GetSupportTicketsAsync() =>
+            from ticket in await _userRepo.GetSupportTicketsAsync()
+            select new SupportTicketResponse()
+            {
+                Id = ticket.Id,
+                SubmittingUserId = ticket.SubmittingUserId,
+                SubmittingUserName = ticket.SubmittingUserName,
+                Subject = ticket.Subject,
+                Content = ticket.Content,
+                Resolved = ticket.Resolved,
+                CreatedDate = ticket.CreatedDate
+            };
+
+        public async Task AddMessageAsync(MessageRequest request, string userId) =>
+            await _userRepo.InsertMessageAsync(new Message()
+            {
+                TicketId = request.TicketId,
+                RecipientId = request.RecipientId,
+                SenderId = userId,
+                Subject = request.Subject,
+                Content = request.Content,
+                Opened = false,
+                CreatedDate = DateTime.Now
+            });
     }
 }

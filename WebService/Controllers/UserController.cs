@@ -93,7 +93,6 @@ namespace WebService.Controllers
         public async Task<ActionResult> LogoutUser()
         {
             var token = GetTokenFromCookie();
-
             ActionResult result = new OkResult();
             try
             {
@@ -125,17 +124,21 @@ namespace WebService.Controllers
         }
 
         [HttpPost]
-        [Route("support")]
+        [Route("ticket")]
         [Authorize]
-        public async Task<ActionResult<SubmitSupportTicketResponse>> SubmitSupportTicket([FromBody] SupportTicketRequest request)
+        public async Task<ActionResult> SubmitSupportTicket([FromBody] SupportTicketRequest request)
         {
             var token = GetTokenFromCookie();
-            var response = await _service.SubmitSupportTicketAsync(request, token);
-            if (response is null)
+            ActionResult result = new OkResult();
+            try
             {
-                return new NotFoundResult();
+                await _service.SubmitSupportTicketAsync(request, token);
             }
-            return new OkObjectResult(response);
+            catch (ArgumentException ex)
+            {
+                result = new UnauthorizedObjectResult(ex.Message);
+            }
+            return result;
         }
 
         [HttpGet]
