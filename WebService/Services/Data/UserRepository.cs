@@ -126,7 +126,7 @@ namespace WebService
         public async Task AddMessageToSupportTicketAsync(string id, Message message)
         {
             var filter = Builders<SupportTicket>.Filter.Eq(x => x.Id, id);
-            var update = Builders<SupportTicket>.Update.Push(x => x.Messages, new Message() { });
+            var update = Builders<SupportTicket>.Update.Push(x => x.Messages, message);
             await _db.GetCollection<SupportTicket>().UpdateOneAsync(filter, update);
         }
     }
