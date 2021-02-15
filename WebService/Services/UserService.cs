@@ -177,14 +177,56 @@ namespace WebService
             {
                 return null;
             }
-            return from message in await _repo.GetMessagesAsync(userId)
+            return from ticket in await _repo.GetSupportTicketsSubmittedByUser(userId)
+                   from message in ticket.Messages
                    select new MessageResponse()
                    {
-                       TicketId = message.TicketId,
+                       TicketId = ticket.Id,
+                       SentBy = message.SentBy.Username,
                        Subject = message.Subject,
                        Content = message.Content,
-                       Opened = message.Opened
+                       Opened = message.Opened,
+                       CreatedDate = message.CreatedDate
                    };
+        }
+
+        public async Task AddMessageAsync(MessageRequest request, Token token)
+        {
+            var userId = _jwt.GetUserIdFromToken(token.Jwt);
+            if (userId is null)
+            {
+                throw new ArgumentException($"Unable to retrieve user from token.");
+            }
+
+            var usernames = from user in await _repo.GetUsersByIdAsync(userId)
+                            select user.Username;
+            if (!usernames.Any())
+            {
+                throw new ArgumentException($"Username not found for id {userId}.");
+            }
+
+            // Users should only be allowed to add messages to support tickets that
+            // they opened.
+            var tickets = from ticket in await _repo.GetSupportTicketsSubmittedByUser(userId)
+                          where ticket.Id == request.TicketId && ticket.SubmittedById == userId
+                          select ticket;
+            if (!tickets.Any())
+            {
+                throw new ArgumentException($"Ticket {request.TicketId} does not belong to user {userId}.");
+            }
+
+            await _repo.AddMessageToSupportTicketAsync(request.TicketId, new Message()
+            {
+                SentBy = new UserData()
+                {
+                    Id = userId,
+                    Username = usernames.First()
+                },
+                Subject = request.Subject,
+                Content = request.Content,
+                Opened = false,
+                CreatedDate = DateTime.Now
+            });
         }
 
         public async Task SubmitSupportTicketAsync(SupportTicketRequest request, Token token)
@@ -204,11 +246,23 @@ namespace WebService
 
             var ticket = await _repo.InsertSupportTicketAsync(new SupportTicket()
             {
-                SubmittingUserId = userId,
-                SubmittingUserName = usernames.First(),
-                Subject = request.Subject,
-                Content = request.Content,
+                SubmittedById = userId,
                 Resolved = false,
+                Messages = new List<Message>()
+                {
+                    new Message()
+                    {
+                        SentBy = new UserData()
+                        {
+                            Id = userId,
+                            Username = usernames.First()
+                        },
+                        Subject = request.Subject,
+                        Content = request.Content,
+                        Opened=false,
+                        CreatedDate = DateTime.Now
+                    }
+                },
                 CreatedDate = DateTime.Now
             });
         }

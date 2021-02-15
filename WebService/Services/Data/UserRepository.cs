@@ -111,22 +111,23 @@ namespace WebService
             return await _db.FindWithFilterAsync(FilterDefinition<SupportTicket>.Empty);
         }
 
+        public async Task<IEnumerable<SupportTicket>> GetSupportTicketsSubmittedByUser(string userId)
+        {
+            var filter = Builders<SupportTicket>.Filter.Eq(x => x.SubmittedById, userId);
+            return await _db.FindWithFilterAsync(filter);
+        }
+
         public async Task<SupportTicket> InsertSupportTicketAsync(SupportTicket ticket)
         {
             await _db.GetCollection<SupportTicket>().InsertOneAsync(ticket);
             return ticket;
         }
 
-        public async Task<IEnumerable<Message>> GetMessagesAsync(string userId)
+        public async Task AddMessageToSupportTicketAsync(string id, Message message)
         {
-            var filter = Builders<Message>.Filter.Eq(x => x.RecipientId, userId);
-            return await _db.FindWithFilterAsync(filter);
-        }
-
-        public async Task<Message> InsertMessageAsync(Message message)
-        {
-            await _db.GetCollection<Message>().InsertOneAsync(message);
-            return message;
+            var filter = Builders<SupportTicket>.Filter.Eq(x => x.Id, id);
+            var update = Builders<SupportTicket>.Update.Push(x => x.Messages, new Message() { });
+            await _db.GetCollection<SupportTicket>().UpdateOneAsync(filter, update);
         }
     }
 }

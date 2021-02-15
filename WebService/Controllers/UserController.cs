@@ -141,6 +141,24 @@ namespace WebService.Controllers
             return result;
         }
 
+        [HttpPost]
+        [Route("message")]
+        [Authorize]
+        public async Task<ActionResult> SubmitMessage([FromBody] MessageRequest request)
+        {
+            var token = GetTokenFromCookie();
+            ActionResult result = new OkResult();
+            try
+            {
+                await _service.AddMessageAsync(request, token);
+            }
+            catch (ArgumentException ex)
+            {
+                result = new UnauthorizedObjectResult(ex.Message);
+            }
+            return result;
+        }
+
         [HttpGet]
         [Route("messages")]
         [Authorize]

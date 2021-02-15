@@ -50,6 +50,8 @@ namespace Tests
                     role.Id = Guid.NewGuid().ToString();
                     return Task.FromResult(role);
                 });
+            _userRepo.Setup(x => x.GetUsersByIdAsync(_userIdFromDbUser))
+                .Returns(Task.FromResult(users));
             _userRepo.Setup(x => x.GetUsersByUsernameAsync(_validUsername))
                 .Returns(Task.FromResult(users));
             _userRepo.Setup(x => x.GetSupportTicketsAsync())
@@ -131,9 +133,8 @@ namespace Tests
         [Fact]
         public async Task InsertsMessage()
         {
-            var userId = Guid.NewGuid().ToString();
-            await _service.AddMessageAsync(new MessageRequest(), userId);
-            _userRepo.Verify(x => x.InsertMessageAsync(It.IsAny<Message>()), Times.Once);
+            await _service.AddMessageAsync(new MessageRequest(), _userIdFromDbUser);
+            _userRepo.Verify(x => x.AddMessageToSupportTicketAsync(It.IsAny<String>(), It.IsAny<Message>()), Times.Once);
         }
     }
 }

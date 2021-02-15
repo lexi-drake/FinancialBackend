@@ -77,24 +77,31 @@ namespace WebService
             select new SupportTicketResponse()
             {
                 Id = ticket.Id,
-                SubmittingUserId = ticket.SubmittingUserId,
-                SubmittingUserName = ticket.SubmittingUserName,
-                Subject = ticket.Subject,
-                Content = ticket.Content,
                 Resolved = ticket.Resolved,
+                Messages = ticket.Messages,
                 CreatedDate = ticket.CreatedDate
             };
 
-        public async Task AddMessageAsync(MessageRequest request, string userId) =>
-            await _userRepo.InsertMessageAsync(new Message()
+        public async Task AddMessageAsync(MessageRequest request, string userId)
+        {
+            var users = await _userRepo.GetUsersByIdAsync(userId);
+            if (!users.Any())
             {
-                TicketId = request.TicketId,
-                RecipientId = request.RecipientId,
-                SenderId = userId,
+                throw new ArgumentException($"Unable to find user {userId}.");
+            }
+
+            await _userRepo.AddMessageToSupportTicketAsync(request.TicketId, new Message()
+            {
+                SentBy = new UserData()
+                {
+                    Id = userId,
+                    Username = users.First().Username
+                },
                 Subject = request.Subject,
                 Content = request.Content,
                 Opened = false,
                 CreatedDate = DateTime.Now
             });
+        }
     }
 }

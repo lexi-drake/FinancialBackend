@@ -21,8 +21,8 @@ namespace WebService
         Task<UserRole> InsertUserRoleAsync(UserRole role);
         Task<bool> SupportTicketExistsWithIdAsync(string id);
         Task<IEnumerable<SupportTicket>> GetSupportTicketsAsync();
+        Task<IEnumerable<SupportTicket>> GetSupportTicketsSubmittedByUser(string userId);
         Task<SupportTicket> InsertSupportTicketAsync(SupportTicket ticket);
-        Task<IEnumerable<Message>> GetMessagesAsync(string userId);
-        Task<Message> InsertMessageAsync(Message message);
+        Task AddMessageToSupportTicketAsync(string id, Message messages);
     }
 }
