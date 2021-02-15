@@ -57,28 +57,6 @@ namespace Tests
         [Theory]
         [InlineData(" ")]
         [InlineData(null)]
-        public async Task RejectsForEmptyRecipientId(string recipientId)
-        {
-            var request = CreateValidRequest();
-            request.RecipientId = recipientId;
-
-            var result = await _validator.ValidateAsync(request);
-            AssertHelper.FailsWithMessage(result, "'Recipient Id' must not be empty.");
-        }
-
-        [Fact]
-        public async Task RejectsForRecipientNotExists()
-        {
-            var request = CreateValidRequest();
-            request.RecipientId = _userIdNotExists;
-
-            var result = await _validator.ValidateAsync(request);
-            AssertHelper.FailsWithMessage(result, $"User not found with id {request.RecipientId}.");
-        }
-
-        [Theory]
-        [InlineData(" ")]
-        [InlineData(null)]
         public async Task RejectsForEmptySubject(string subject)
         {
             var request = CreateValidRequest();
@@ -105,7 +83,6 @@ namespace Tests
             return new MessageRequest()
             {
                 TicketId = _ticketIdExists,
-                RecipientId = _userIdExists,
                 Subject = Guid.NewGuid().ToString(),
                 Content = Guid.NewGuid().ToString()
             };
