@@ -116,7 +116,6 @@ namespace Tests
         public async Task GetsUserCount()
         {
             var response = await _service.GetUserCountAsync();
-            Assert.NotNull(response);
             Assert.Equal(_count, response);
         }
 

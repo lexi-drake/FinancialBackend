@@ -24,5 +24,6 @@ namespace WebService
         Task<IEnumerable<SupportTicket>> GetSupportTicketsSubmittedByUser(string userId);
         Task<SupportTicket> InsertSupportTicketAsync(SupportTicket ticket);
         Task AddMessageToSupportTicketAsync(string id, Message messages);
+        Task UpdateSupportTicketResolvedAsync(string id, bool resolved);
     }
 }

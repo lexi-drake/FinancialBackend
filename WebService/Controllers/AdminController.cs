@@ -24,11 +24,8 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("")]
-        public ActionResult CheckAdmin()
-        {
-            // Like UserController.CheckLoggedIn, if the request gets this far, it's good.
-            return new OkResult();
-        }
+        // Like UserController.CheckLoggedIn, if the request gets this far, it's good.
+        public ActionResult CheckAdmin() => new OkResult();
 
         [HttpPost]
         [Route("frequency")]
@@ -99,9 +96,16 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("tickets")]
-        public async Task<ActionResult<IEnumerable<SupportTicketResponse>>> GetTickets()
+        public async Task<ActionResult<IEnumerable<SupportTicketResponse>>> GetTickets() =>
+            new OkObjectResult(await _service.GetSupportTicketsAsync());
+
+
+        [HttpPost]
+        [Route("ticket/{id}/resolve")]
+        public async Task<ActionResult> ResolveTicket(string id)
         {
-            return new OkObjectResult(await _service.GetSupportTicketsAsync());
+            await _service.ResolveSupportTicketAsync(id);
+            return new OkResult();
         }
 
         [HttpPost]

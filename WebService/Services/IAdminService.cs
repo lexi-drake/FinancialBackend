@@ -11,6 +11,7 @@ namespace WebService
         Task AddSalaryTypeAsync(SalaryTypeRequest request, string userId);
         Task AddTransactionTypeAsync(TransactionTypeRequest request, string userId);
         Task<IEnumerable<SupportTicketResponse>> GetSupportTicketsAsync();
+        Task ResolveSupportTicketAsync(string ticketId);
         Task AddMessageAsync(MessageRequest request, string userId);
     }
 }

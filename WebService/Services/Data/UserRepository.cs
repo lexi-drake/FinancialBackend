@@ -129,5 +129,12 @@ namespace WebService
             var update = Builders<SupportTicket>.Update.Push(x => x.Messages, message);
             await _db.GetCollection<SupportTicket>().UpdateOneAsync(filter, update);
         }
+
+        public async Task UpdateSupportTicketResolvedAsync(string id, bool resolved)
+        {
+            var filter = Builders<SupportTicket>.Filter.Eq(x => x.Id, id);
+            var update = Builders<SupportTicket>.Update.Set(x => x.Resolved, resolved);
+            await _db.GetCollection<SupportTicket>().UpdateOneAsync(filter, update);
+        }
     }
 }

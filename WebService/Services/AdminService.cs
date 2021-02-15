@@ -82,6 +82,9 @@ namespace WebService
                 CreatedDate = ticket.CreatedDate
             };
 
+        public async Task ResolveSupportTicketAsync(string ticketId) =>
+            await _userRepo.UpdateSupportTicketResolvedAsync(ticketId, true);
+
         public async Task AddMessageAsync(MessageRequest request, string userId)
         {
             var users = await _userRepo.GetUsersByIdAsync(userId);
