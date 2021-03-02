@@ -41,8 +41,10 @@ namespace WebService
 
         private DateTime FromMMDDYYYY(string date)
         {
+            _logger.Information(date);
             // parsedDate will be DateTime.MinValue if parsing fails.
             DateTime.TryParseExact(date, "MMddyyyy", null, DateTimeStyles.None, out var parsedDate);
+            _logger.Information(parsedDate.ToUniversalTime().ToString());
             return parsedDate.ToUniversalTime();
         }
 
