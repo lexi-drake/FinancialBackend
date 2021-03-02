@@ -21,7 +21,22 @@ namespace Tests
         public AdminServiceShould()
         {
             IEnumerable<User> users = new List<User>() { new User() { Id = _userIdFromDbUser, Username = _validUsername } };
-            IEnumerable<SupportTicket> tickets = new List<SupportTicket>() { new SupportTicket() };
+            IEnumerable<SupportTicket> tickets = new List<SupportTicket>()
+            {
+                 new SupportTicket()
+                 {
+                     Messages = new List<Message>()
+                     {
+                         new Message()
+                         {
+                             SentBy = new UserData()
+                             {
+                                 Username =Guid.NewGuid().ToString()
+                             }
+                         }
+                     }
+                 }
+            };
 
             _ledgerRepo = new Mock<ILedgerRepository>();
             _ledgerRepo.Setup(x => x.InsertOneAsync(It.IsAny<Frequency>()))
