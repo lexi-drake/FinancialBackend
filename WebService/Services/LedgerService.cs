@@ -43,7 +43,7 @@ namespace WebService
         {
             // parsedDate will be DateTime.MinValue if parsing fails.
             DateTime.TryParseExact(date, "MMddyyyy", null, DateTimeStyles.None, out var parsedDate);
-            return parsedDate;
+            return parsedDate.ToUniversalTime();
         }
 
         public async Task<LedgerEntryResponse> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
@@ -57,6 +57,7 @@ namespace WebService
                 Amount = new Decimal(request.Amount),
                 TransactionTypeId = request.TransactionTypeId,
                 TransactionDate = request.TransactionDate,
+                RecurringTransactionId = request.RecurringTransactionId,
                 CreatedDate = DateTime.Now
             });
 
