@@ -78,7 +78,16 @@ namespace WebService
             {
                 Id = ticket.Id,
                 Resolved = ticket.Resolved,
-                Messages = ticket.Messages,
+                Messages = from message in ticket.Messages
+                           select new MessageResponse()
+                           {
+                               TicketId = ticket.Id,
+                               SentBy = message.SentBy.Username,
+                               Subject = message.Subject,
+                               Content = message.Content,
+                               Opened = message.Opened,
+                               CreatedDate = message.CreatedDate
+                           },
                 CreatedDate = ticket.CreatedDate
             };
 

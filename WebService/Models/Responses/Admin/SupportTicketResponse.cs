@@ -7,7 +7,7 @@ namespace WebService
     {
         public string Id { get; set; }
         public bool Resolved { get; set; }
-        public IEnumerable<Message> Messages { get; set; }
+        public IEnumerable<MessageResponse> Messages { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }
