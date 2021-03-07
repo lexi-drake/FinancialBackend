@@ -27,8 +27,8 @@ namespace WebService
 
         public async Task<IEnumerable<LedgerEntryResponse>> GetLedgerEntriesBetweenDatesAsync(string start, string end, string userId)
         {
-            var startDate = FromMMDDYYYY(start);
-            var endDate = FromMMDDYYYY(end);
+            var startDate = FromMilliseconds(start);
+            var endDate = FromMilliseconds(end);
             if (startDate == DateTime.MinValue || endDate == DateTime.MinValue || endDate < startDate)
             {
                 return null;
@@ -39,13 +39,11 @@ namespace WebService
                    select LedgerEntryResponse.FromDBObject(entry, transactionTypes);
         }
 
-        private DateTime FromMMDDYYYY(string date)
+        private DateTime FromMilliseconds(string milliseconds)
         {
-            _logger.Information(date);
-            // parsedDate will be DateTime.MinValue if parsing fails.
-            DateTime.TryParseExact(date, "MMddyyyy", null, DateTimeStyles.None, out var parsedDate);
-            _logger.Information(parsedDate.ToUniversalTime().ToString());
-            return parsedDate.ToUniversalTime();
+            var ticks = double.Parse(milliseconds);
+            var timespan = TimeSpan.FromMilliseconds(ticks);
+            return new DateTime(1970, 1, 1) + timespan;
         }
 
         public async Task<LedgerEntryResponse> AddLedgerEntryAsync(LedgerEntryRequest request, string userId)
