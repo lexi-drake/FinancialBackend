@@ -72,48 +72,44 @@ namespace WebService
                  CreatedDate = DateTime.Now
              });
 
-        public async Task<IEnumerable<SupportTicketResponse>> GetSupportTicketsAsync() =>
-            from ticket in await _userRepo.GetSupportTicketsAsync()
-            select new SupportTicketResponse()
-            {
-                Id = ticket.Id,
-                Resolved = ticket.Resolved,
-                Messages = from message in ticket.Messages
-                           select new MessageResponse()
-                           {
-                               TicketId = ticket.Id,
-                               SentBy = message.SentBy.Username,
-                               Subject = message.Subject,
-                               Content = message.Content,
-                               Opened = message.Opened,
-                               CreatedDate = message.CreatedDate
-                           },
-                CreatedDate = ticket.CreatedDate
-            };
+        public async Task<IEnumerable<SupportTicketResponse>> GetSupportTicketsAsync()
+        {
+            var tickets = await _userRepo.GetSupportTicketsAsync();
+
+            var userIds = from ticket in tickets
+                          from message in ticket.Messages
+                          select message.SentById;
+            var userInfo = await _userRepo.GetUsernames(userIds);
+
+            return from ticket in tickets
+                   select new SupportTicketResponse()
+                   {
+                       Id = ticket.Id,
+                       Resolved = ticket.Resolved,
+                       Messages = from message in ticket.Messages
+                                  select new MessageResponse()
+                                  {
+                                      SentBy = userInfo[message.SentById],
+                                      Subject = message.Subject,
+                                      Content = message.Content,
+                                      Opened = message.Opened,
+                                      CreatedDate = message.CreatedDate
+                                  },
+                       CreatedDate = ticket.CreatedDate
+                   };
+        }
 
         public async Task ResolveSupportTicketAsync(string ticketId) =>
             await _userRepo.UpdateSupportTicketResolvedAsync(ticketId, true);
 
-        public async Task AddMessageAsync(MessageRequest request, string userId)
-        {
-            var users = await _userRepo.GetUsersByIdAsync(userId);
-            if (!users.Any())
-            {
-                throw new ArgumentException($"Unable to find user {userId}.");
-            }
-
+        public async Task AddMessageAsync(MessageRequest request, string userId) =>
             await _userRepo.AddMessageToSupportTicketAsync(request.TicketId, new Message()
             {
-                SentBy = new UserData()
-                {
-                    Id = userId,
-                    Username = users.First().Username
-                },
+                SentById = userId,
                 Subject = request.Subject,
                 Content = request.Content,
                 Opened = false,
                 CreatedDate = DateTime.Now
             });
-        }
     }
 }

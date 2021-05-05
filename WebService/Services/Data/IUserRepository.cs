@@ -8,6 +8,7 @@ namespace WebService
     {
         Task<long> GetUserCountAsync();
         Task<bool> UserExistsWithIdAsync(string userId);
+        Task<Dictionary<string, string>> GetUsernames(IEnumerable<string> ids);
         Task<IEnumerable<User>> GetUsersByIdAsync(string userId);
         Task<IEnumerable<User>> GetUsersByUsernameAsync(string username);
         Task<User> InsertUserAsync(User user);

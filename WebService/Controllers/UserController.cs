@@ -160,12 +160,12 @@ namespace WebService.Controllers
         }
 
         [HttpGet]
-        [Route("messages")]
+        [Route("tickets")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<MessageResponse>>> GetMessages()
         {
             var token = GetTokenFromCookie();
-            var response = await _service.GetMessagesAsync(token);
+            var response = await _service.GetTicketsAsync(token);
             if (response is null)
             {
                 return new NotFoundResult();

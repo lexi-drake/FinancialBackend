@@ -29,10 +29,7 @@ namespace Tests
                      {
                          new Message()
                          {
-                             SentBy = new UserData()
-                             {
-                                 Username =Guid.NewGuid().ToString()
-                             }
+                             SentById = Guid.NewGuid().ToString()
                          }
                      }
                  }

@@ -18,16 +18,10 @@ namespace WebService
 
     public class Message
     {
-        public UserData SentBy { get; set; }
+        public string SentById { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
         public bool Opened { get; set; }
         public DateTime CreatedDate { get; set; }
-    }
-
-    public class UserData
-    {
-        public string Id { get; set; }
-        public string Username { get; set; }
     }
 }

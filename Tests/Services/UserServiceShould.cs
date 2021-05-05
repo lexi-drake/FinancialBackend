@@ -53,11 +53,7 @@ namespace Tests
             IEnumerable<User> noUsers = new List<User>();
             IEnumerable<RefreshData> refreshData = new List<RefreshData>() { refresh };
             IEnumerable<Message> messages = new List<Message>() { new Message(){
-                SentBy = new UserData()
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Username = Guid.NewGuid().ToString()
-                },
+                SentById = Guid.NewGuid().ToString(),
                 Subject = Guid.NewGuid().ToString(),
                 Content = Guid.NewGuid().ToString(),
                 Opened = false
@@ -244,16 +240,14 @@ namespace Tests
         }
 
         [Fact]
-        public async Task ReturnsMessagesForUser()
+        public async Task ReturnTicketsForUser()
         {
-            var response = await _service.GetMessagesAsync(_token);
+            var response = await _service.GetTicketsAsync(_token);
             Assert.NotNull(response);
             Assert.Single(response);
 
-            var message = response.First();
-            Assert.NotNull(message.TicketId);
-            Assert.NotNull(message.Subject);
-            Assert.NotNull(message.Content);
+            var ticket = response.First();
+            Assert.Single(ticket.Messages);
         }
 
         [Fact]

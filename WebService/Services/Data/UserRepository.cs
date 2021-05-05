@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -25,6 +26,23 @@ namespace WebService
             var filter = Builders<User>.Filter.Eq(x => x.Id, userId);
             var count = await _db.GetCollection<User>().CountDocumentsAsync(filter);
             return count > 0;
+        }
+
+
+        public async Task<Dictionary<string, string>> GetUsernames(IEnumerable<string> ids)
+        {
+            var response = new Dictionary<string, string>();
+            foreach (var id in ids)
+            {
+                if (!response.ContainsKey(id))
+                {
+
+                    var users = await GetUsersByIdAsync(id);
+                    var username = users.Any() ? users.First().Username : "UNKNOWN";
+                    response.Add(id, username);
+                }
+            }
+            return response;
         }
 
         public async Task<IEnumerable<User>> GetUsersByIdAsync(string userId)

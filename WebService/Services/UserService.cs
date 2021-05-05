@@ -170,23 +170,36 @@ namespace WebService
             };
         }
 
-        public async Task<IEnumerable<MessageResponse>> GetMessagesAsync(Token token)
+        public async Task<IEnumerable<SupportTicketResponse>> GetTicketsAsync(Token token)
         {
             var userId = _jwt.GetUserIdFromToken(token.Jwt);
             if (userId is null)
             {
                 return null;
             }
-            return from ticket in await _repo.GetSupportTicketsSubmittedByUser(userId)
-                   from message in ticket.Messages
-                   select new MessageResponse()
+
+            var tickets = await _repo.GetSupportTicketsSubmittedByUser(userId);
+
+            var userIds = from ticket in tickets
+                          from message in ticket.Messages
+                          select message.SentById;
+            var userInfo = await _repo.GetUsernames(userIds);
+
+            return from ticket in tickets
+                   select new SupportTicketResponse()
                    {
-                       TicketId = ticket.Id,
-                       SentBy = message.SentBy.Username,
-                       Subject = message.Subject,
-                       Content = message.Content,
-                       Opened = message.Opened,
-                       CreatedDate = message.CreatedDate
+                       Id = ticket.Id,
+                       Resolved = ticket.Resolved,
+                       Messages = from message in ticket.Messages
+                                  select new MessageResponse()
+                                  {
+                                      SentBy = userInfo[message.SentById],
+                                      Subject = message.Subject,
+                                      Content = message.Content,
+                                      Opened = message.Opened,
+                                      CreatedDate = message.CreatedDate
+                                  },
+                       CreatedDate = ticket.CreatedDate
                    };
         }
 
@@ -196,13 +209,6 @@ namespace WebService
             if (userId is null)
             {
                 throw new ArgumentException($"Unable to retrieve user from token.");
-            }
-
-            var usernames = from user in await _repo.GetUsersByIdAsync(userId)
-                            select user.Username;
-            if (!usernames.Any())
-            {
-                throw new ArgumentException($"Username not found for id {userId}.");
             }
 
             // Users should only be allowed to add messages to support tickets that
@@ -217,11 +223,7 @@ namespace WebService
 
             await _repo.AddMessageToSupportTicketAsync(request.TicketId, new Message()
             {
-                SentBy = new UserData()
-                {
-                    Id = userId,
-                    Username = usernames.First()
-                },
+                SentById = userId,
                 Subject = request.Subject,
                 Content = request.Content,
                 Opened = false,
@@ -237,13 +239,6 @@ namespace WebService
                 throw new ArgumentException("Invalid Jwt.");
             }
 
-            var usernames = from user in await _repo.GetUsersByIdAsync(userId)
-                            select user.Username;
-            if (!usernames.Any())
-            {
-                throw new ArgumentException($"Username not found for id {userId}.");
-            }
-
             var ticket = await _repo.InsertSupportTicketAsync(new SupportTicket()
             {
                 SubmittedById = userId,
@@ -252,11 +247,7 @@ namespace WebService
                 {
                     new Message()
                     {
-                        SentBy = new UserData()
-                        {
-                            Id = userId,
-                            Username = usernames.First()
-                        },
+                        SentById = userId,
                         Subject = request.Subject,
                         Content = request.Content,
                         Opened=false,
