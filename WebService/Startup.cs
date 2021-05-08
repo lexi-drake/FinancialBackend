@@ -54,8 +54,6 @@ namespace WebService
             var issuer = Configuration["ISSUER"];
             var secret = Configuration["JWT_SECRET"];
             services.AddScoped<IJwtHelper>(s => new JwtHelper(secret, issuer, audience));
-            services.AddScoped<ILedgerService, LedgerService>();
-            services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<ILedgerRepository>(s =>
                 new LedgerRepository(s.GetRequiredService<IMemoryCache>(), Configuration["MONGO_DB"], Configuration["LEDGER_DB"]));
