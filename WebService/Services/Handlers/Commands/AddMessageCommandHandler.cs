@@ -25,7 +25,7 @@ namespace WebService
             _logger.Information($"Adding message with subject {command.Request.Subject} to ticket {command.Request.TicketId}.");
 
             var userId = _jwt.GetUserIdFromToken(command.Token.Jwt);
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 _logger.Throw($"Unable to get user id from jwt {command.Token.Jwt}.");
             }
@@ -42,6 +42,7 @@ namespace WebService
             // a message to the ticket.
             if (!role.Equals("admin", StringComparison.InvariantCultureIgnoreCase) && ticket.SubmittedById != userId)
             {
+                Console.WriteLine($"{ticket.SubmittedById} vs {userId}");
                 _logger.Throw($"User with id {userId} attempted to add a message to ticket {command.Request.TicketId}, but is not allowed.");
             }
 
