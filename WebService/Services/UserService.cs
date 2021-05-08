@@ -180,11 +180,6 @@ namespace WebService
 
             var tickets = await _repo.GetSupportTicketsSubmittedByUser(userId);
 
-            var userIds = from ticket in tickets
-                          from message in ticket.Messages
-                          select message.SentById;
-            var userInfo = await _repo.GetUsernames(userIds);
-
             return from ticket in tickets
                    select new SupportTicketResponse()
                    {
@@ -193,7 +188,7 @@ namespace WebService
                        Messages = from message in ticket.Messages
                                   select new MessageResponse()
                                   {
-                                      SentBy = userInfo[message.SentById],
+                                      SentBy = message.SentBy,
                                       Subject = message.Subject,
                                       Content = message.Content,
                                       Opened = message.Opened,
@@ -208,7 +203,13 @@ namespace WebService
             var userId = _jwt.GetUserIdFromToken(token.Jwt);
             if (userId is null)
             {
-                throw new ArgumentException($"Unable to retrieve user from token.");
+                _logger.Throw($"Unable to retrieve user from token {token.Jwt}.");
+            }
+
+            var users = await _repo.GetUsersByIdAsync(userId);
+            if (!users.Any())
+            {
+                _logger.Throw($"Unable to find user with id {userId}.")
             }
 
             // Users should only be allowed to add messages to support tickets that
@@ -218,12 +219,12 @@ namespace WebService
                           select ticket;
             if (!tickets.Any())
             {
-                throw new ArgumentException($"Ticket {request.TicketId} does not belong to user {userId}.");
+                _logger.Throw($"Ticket {request.TicketId} does not belong to user {userId}.");
             }
 
             await _repo.AddMessageToSupportTicketAsync(request.TicketId, new Message()
             {
-                SentById = userId,
+                SentBy = users.First().Username,
                 Subject = request.Subject,
                 Content = request.Content,
                 Opened = false,

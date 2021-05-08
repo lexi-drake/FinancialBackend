@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,12 +16,6 @@ namespace WebService
         {
             _cache = cache;
             _db = new MongoClient(connectionString).GetDatabase(database);
-        }
-
-        public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesByUserIdAsync(string userId)
-        {
-            var filter = Builders<LedgerEntry>.Filter.Eq(x => x.UserId, userId);
-            return await _db.FindWithFilterAsync(filter);
         }
 
         public async Task<IEnumerable<LedgerEntry>> GetLedgerEntriesBetweenDatesAsync(DateTime start, DateTime end, string userId)
@@ -48,31 +43,45 @@ namespace WebService
             await _db.GetCollection<LedgerEntry>().DeleteOneAsync(idFilter & userIdFilter);
         }
 
-        public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category)
-        {
-            var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Category, category);
-            return await _db.FindWithFilterAsync(filter);
-        }
-
         public async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesLikeAsync(string regex)
         {
             var filter = Builders<LedgerEntryCategory>.Filter.Regex(x => x.Category, regex);
             return await _db.FindWithFilterAsync(filter);
         }
 
-        public async Task<LedgerEntryCategory> InsertLedgerEntryCategoryAsync(LedgerEntryCategory category)
+        public async Task InsertOrUpdateCategoryAsync(string category)
         {
+            var categories = from c in await GetLedgerEntryCategoriesByCategoryAsync(category)
+                             where c.Category.Equals(category, StringComparison.InvariantCultureIgnoreCase)
+                             select c;
+
+            if (categories.Any())
+            {
+                // If we already have this category in the database, use the existing id.
+                await UpdateLedgerEntryCategoryLastUsedAsync(categories.First().Id, DateTime.Now);
+                return;
+            }
+            // If we don't have this category in the database, insert a new category
+            // and use its id
+            await InsertLedgerEntryCategoryAsync(new LedgerEntryCategory()
+            {
+                Category = category,
+                CreatedDate = DateTime.Now,
+                LastUsed = DateTime.Now
+            });
+        }
+
+        private async Task<IEnumerable<LedgerEntryCategory>> GetLedgerEntryCategoriesByCategoryAsync(string category) =>
+            await _db.FindWithFilterAsync(Builders<LedgerEntryCategory>.Filter.Eq(x => x.Category, category));
+
+        private async Task InsertLedgerEntryCategoryAsync(LedgerEntryCategory category) =>
             await _db.GetCollection<LedgerEntryCategory>().InsertOneAsync(category);
-            return category;
-        }
 
-        public async Task UpdateLedgerEntryCategoryLastUsedAsync(string id, DateTime lastUsed)
-        {
-            var filter = Builders<LedgerEntryCategory>.Filter.Eq(x => x.Id, id);
-            var update = Builders<LedgerEntryCategory>.Update.Set(x => x.LastUsed, lastUsed);
 
-            await _db.GetCollection<LedgerEntryCategory>().UpdateOneAsync(filter, update);
-        }
+        private async Task UpdateLedgerEntryCategoryLastUsedAsync(string id, DateTime lastUsed) =>
+            await _db.GetCollection<LedgerEntryCategory>().UpdateOneAsync(
+                Builders<LedgerEntryCategory>.Filter.Eq(x => x.Id, id),
+                Builders<LedgerEntryCategory>.Update.Set(x => x.LastUsed, lastUsed));
 
         public async Task<IEnumerable<IncomeGenerator>> GetIncomeGeneratorsByIdAsync(string id)
         {

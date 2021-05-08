@@ -10,8 +10,7 @@ namespace WebService
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string Category { get; set; }
-        // TTL index
-        public DateTime LastUsed { get; set; }
+        public DateTime LastUsed { get; set; }          // TTL Index
         public DateTime CreatedDate { get; set; }
     }
 }

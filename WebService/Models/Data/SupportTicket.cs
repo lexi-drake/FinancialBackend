@@ -18,7 +18,8 @@ namespace WebService
 
     public class Message
     {
-        public string SentById { get; set; }
+        // Username
+        public string SentBy { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
         public bool Opened { get; set; }
