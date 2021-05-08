@@ -99,30 +99,6 @@ namespace WebService.Controllers
         //     return new OkResult();
         // }
 
-        [HttpGet]
-        [Route("tickets")]
-        public async Task<ActionResult<IEnumerable<SupportTicketResponse>>> GetTickets()
-        {
-            var userId = GetUserIdFromCookie();
-            if (userId is null)
-            {
-                return new UnauthorizedResult();
-            }
-            try
-            {
-                var tickets = await _mediatr.Send(new GetMessagesQuery()
-                {
-                    UserId = userId
-                });
-                return tickets is null ? new NotFoundResult() : new OkObjectResult(tickets);
-            }
-            catch (ArgumentException)
-            {
-                return new NotFoundResult();
-            }
-        }
-
-
         [HttpPost]
         [Route("ticket/{id}/resolve")]
         public async Task<ActionResult> ResolveTicket(string id)
@@ -139,31 +115,6 @@ namespace WebService.Controllers
                 {
                     Id = id,
                     UserId = userId
-                });
-                return new OkResult();
-            }
-            catch (ArgumentException)
-            {
-                return new NotFoundResult();
-            }
-        }
-
-        [HttpPost]
-        [Route("message")]
-        public async Task<ActionResult> SubmitMessage([FromBody] MessageRequest request)
-        {
-            var userId = GetUserIdFromCookie();
-            if (userId is null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            try
-            {
-                await _mediatr.Send(new AddMessageCommand()
-                {
-                    UserId = userId,
-                    Request = request
                 });
                 return new OkResult();
             }

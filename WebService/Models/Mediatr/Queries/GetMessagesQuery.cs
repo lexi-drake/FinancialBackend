@@ -5,6 +5,6 @@ namespace WebService
 {
     public class GetMessagesQuery : IRequest<IEnumerable<SupportTicketResponse>>
     {
-        public string UserId { get; set; }
+        public Token Token { get; set; }
     }
 }

@@ -12,27 +12,34 @@ namespace WebService
     {
         private ILogger _logger;
         private IUserRepository _repo;
+        private IJwtHelper _jwt;
 
-        public GetMessagesQueryHandler(ILogger logger, IUserRepository repo)
+        public GetMessagesQueryHandler(ILogger logger, IUserRepository repo, IJwtHelper jwt)
         {
             _logger = logger;
             _repo = repo;
+            _jwt = jwt;
         }
 
         public async Task<IEnumerable<SupportTicketResponse>> Handle(GetMessagesQuery query, CancellationToken cancellation)
         {
-            var users = await _repo.GetUsersByIdAsync(query.UserId);
-            if (!users.Any())
+            var role = _jwt.GetRoleFromToken(query.Token.Jwt);
+            if (string.IsNullOrEmpty(role))
             {
-                _logger.Throw($"Unable to find user with id {query.UserId}.");
+                _logger.Throw($"Unable to retrieve role from jwt {query.Token.Jwt}.");
             }
 
-            var user = users.First();
-            if (user.Role.Equals("admin", StringComparison.CurrentCultureIgnoreCase))
+            if (role.Equals("admin", StringComparison.CurrentCultureIgnoreCase))
             {
                 return await GetAllTicketsAsync();
             }
-            return await GetUserTicketsAsync(user.Id);
+
+            var userId = _jwt.GetUserIdFromToken(query.Token.Jwt);
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.Throw($"Unable to retrieve user id from jwt {query.Token.Jwt}.");
+            }
+            return await GetUserTicketsAsync(userId);
         }
 
         private async Task<IEnumerable<SupportTicketResponse>> GetAllTicketsAsync() =>

@@ -4,7 +4,7 @@ namespace WebService
 {
     public class AddMessageCommand : IRequest
     {
-        public string UserId { get; set; }
+        public Token Token { get; set; }
         public MessageRequest Request { get; set; }
     }
 }
