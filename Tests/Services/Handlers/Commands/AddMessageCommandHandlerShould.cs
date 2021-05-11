@@ -40,8 +40,6 @@ namespace Tests
             };
             IEnumerable<SupportTicket> noTickets = new List<SupportTicket>();
 
-            IEnumerable<User> users = new List<User>() { new User() };
-            IEnumerable<User> noUsers = new List<User>();
 
             var logger = new Mock<ILogger>();
             _repo = new Mock<IUserRepository>();
@@ -51,12 +49,8 @@ namespace Tests
                     var response = id == _validTicketId ? tickets : id == _invalidTicketId ? ticketsWithForInvalidUser : noTickets;
                     return Task.FromResult(response);
                 });
-            _repo.Setup(x => x.GetUsersByIdAsync(It.IsAny<string>()))
-                .Returns<string>(id =>
-                {
-                    var response = id == _invalidUserId ? noUsers : users;
-                    return Task.FromResult(response);
-                });
+            _repo.SetupUserRepo(_invalidUserId);
+
 
             _handler = new AddMessageCommandHandler(logger.Object, _repo.Object, _jwt);
         }
