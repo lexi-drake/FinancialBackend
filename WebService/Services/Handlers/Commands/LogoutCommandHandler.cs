@@ -24,7 +24,7 @@ namespace WebService
             var userId = _jwt.GetUserIdFromToken(command.Token.Jwt);
             if (userId is null)
             {
-                _logger.Throw("Cannot logout user with empty jwt token");
+                _logger.Throw($"Unable to retrieve user id from jwt {command.Token.Jwt}.");
             }
 
             var ids = from data in await _repo.GetRefreshDataByUserIdAsync(userId)

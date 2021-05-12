@@ -25,11 +25,11 @@ namespace WebService
             var generators = await _repo.GetIncomeGeneratorsByIdAsync(query.Id);
             if (!generators.Any())
             {
-                _logger.Throw($"Unable to find user with id {query.UserId}.");
+                _logger.Throw($"Unable to find income generator with id {query.Id}.");
             }
 
             var generator = generators.First();
-            if (generator.UserId != query.Id)
+            if (generator.UserId != query.UserId)
             {
                 _logger.Throw($"Income generator with id {query.Id} does not belong to user with id {query.UserId}.");
             }

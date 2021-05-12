@@ -28,7 +28,7 @@ namespace Tests
         }
 
         [Fact]
-        public void ReturnsToken()
+        public void ReturnToken()
         {
             var token = _jwt.CreateToken(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
             Assert.NotNull(token);
@@ -37,7 +37,17 @@ namespace Tests
         }
 
         [Fact]
-        public void GetsUserIdFromJwt()
+        public void ReturnNullUserIdIfInvalidJwt() =>
+            Assert.True(string.IsNullOrEmpty(_jwt.GetUserIdFromToken(Guid.NewGuid().ToString())));
+
+
+        [Fact]
+        public void ReturnNullRoleIfInvalidJwt() =>
+            Assert.True(string.IsNullOrEmpty(_jwt.GetRoleFromToken(Guid.NewGuid().ToString())));
+
+
+        [Fact]
+        public void GetUserIdFromJwt()
         {
             var userId = Guid.NewGuid().ToString();
 
@@ -51,7 +61,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GetsRoleFromJwt()
+        public void GetRoleFromJwt()
         {
             var role = Guid.NewGuid().ToString();
 

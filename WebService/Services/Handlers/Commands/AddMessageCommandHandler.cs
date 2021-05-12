@@ -27,7 +27,7 @@ namespace WebService
             var userId = _jwt.GetUserIdFromToken(command.Token.Jwt);
             if (string.IsNullOrEmpty(userId))
             {
-                _logger.Throw($"Unable to get user id from jwt {command.Token.Jwt}.");
+                _logger.Throw($"Unable to retrieve user id from jwt {command.Token.Jwt}.");
             }
             var role = _jwt.GetRoleFromToken(command.Token.Jwt);
 

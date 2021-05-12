@@ -24,17 +24,20 @@ namespace Tests
             _handler = new AddSupportTicketCommandHandler(logger.Object, _repo.Object, _jwt);
         }
 
-        // TODO (alexa): Figure out how to trigger the first exception condition 
-        // (null/empty userId).
+        [Fact]
+        public async Task ThrowIfBadJwt()
+        {
+            var query = CreateValidCommand();
+            query.Token.Jwt = Guid.NewGuid().ToString();
+            await _handler.AssertThrowsArgumentExceptionWithMessage(query, $"Unable to retrieve user id from jwt {query.Token.Jwt}.");
+        }
 
         [Fact]
         public async Task ThrowIfInvalidUser()
         {
             var command = CreateValidCommand();
             command.Token = _jwt.CreateToken(_invalidUserId, "User");
-
-            var ex = await Assert.ThrowsAsync<ArgumentException>(async () => await _handler.Handle(command, new CancellationToken()));
-            Assert.Equal($"Unable to find user with id {_invalidUserId}.", ex.Message);
+            await _handler.AssertThrowsArgumentExceptionWithMessage(command, $"Unable to find user with id {_invalidUserId}.");
         }
 
         [Fact]

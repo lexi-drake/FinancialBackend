@@ -28,7 +28,7 @@ namespace WebService
             var userId = _jwt.GetUserIdFromToken(command.Token.Jwt);
             if (userId is null)
             {
-                _logger.Throw($"Unable to get user id from jwt {command.Token.Jwt}.");
+                _logger.Throw($"Unable to retrieve user id from jwt {command.Token.Jwt}.");
             }
 
             var users = await _repo.GetUsersByIdAsync(userId);

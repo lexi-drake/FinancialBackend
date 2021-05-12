@@ -30,8 +30,13 @@ namespace Tests
             _handler = new LogoutCommandHandler(logger.Object, _repo.Object, _jwt);
         }
 
-        // TODO (alexa): Figure out how to trigger the first exception condition 
-        // (null/empty userId).
+        [Fact]
+        public async Task ThrowIfBadJwt()
+        {
+            var query = CreateValidCommand();
+            query.Token.Jwt = Guid.NewGuid().ToString();
+            await _handler.AssertThrowsArgumentExceptionWithMessage(query, $"Unable to retrieve user id from jwt {query.Token.Jwt}.");
+        }
 
         [Fact]
         public async Task DeleteAllRefreshData()
