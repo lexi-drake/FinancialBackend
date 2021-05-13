@@ -34,11 +34,8 @@ namespace WebService
                 return await GetAllTicketsAsync();
             }
 
+            // If a role was retrieved, it's a valid Jwt.
             var userId = _jwt.GetUserIdFromToken(query.Token.Jwt);
-            if (string.IsNullOrEmpty(userId))
-            {
-                _logger.Throw($"Unable to retrieve user id from jwt {query.Token.Jwt}.");
-            }
             return await GetUserTicketsAsync(userId);
         }
 
