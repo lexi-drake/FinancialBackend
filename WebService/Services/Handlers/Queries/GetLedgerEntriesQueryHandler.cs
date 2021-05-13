@@ -25,7 +25,7 @@ namespace WebService
             var endDate = FromMilliseconds(query.End);
             if (startDate == DateTime.MinValue || endDate == DateTime.MinValue || endDate < startDate)
             {
-                _logger.Throw($"Unable to parse millesecond values {query.Start} and/or {query.End}.");
+                _logger.Throw($"Unable to parse millisecond values {query.Start} and/or {query.End}.");
             }
             var transactionTypes = await _repo.GetAllAsync<TransactionType>();
             return from entry in await _repo.GetLedgerEntriesBetweenDatesAsync(startDate, endDate, query.UserId)
@@ -34,9 +34,12 @@ namespace WebService
 
         private DateTime FromMilliseconds(string milliseconds)
         {
-            var ticks = double.Parse(milliseconds);
-            var timespan = TimeSpan.FromMilliseconds(ticks);
-            return new DateTime(1970, 1, 1) + timespan;
+            if (double.TryParse(milliseconds, out var ticks))
+            {
+                var timespan = TimeSpan.FromMilliseconds(ticks);
+                return new DateTime(1970, 1, 1) + timespan;
+            }
+            return DateTime.MinValue;
         }
     }
 }
