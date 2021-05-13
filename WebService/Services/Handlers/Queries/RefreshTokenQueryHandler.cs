@@ -29,6 +29,10 @@ namespace WebService
 
             var userId = _jwt.GetUserIdFromToken(query.Token.Jwt);
             var role = _jwt.GetRoleFromToken(query.Token.Jwt);
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
+            {
+                _logger.Throw($"Unable to retrieve user id or role from jwt {query.Token.Jwt}.");
+            }
 
             var refreshData = from data in await _repo.GetRefreshDataByUserIdAsync(userId)
                               where data.Refresh == query.Token.Refresh

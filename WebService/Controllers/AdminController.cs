@@ -57,7 +57,7 @@ namespace WebService.Controllers
         private async Task<ActionResult> AddLedgerItem(AbstractLedgerItem item)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -74,7 +74,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> CreateUserRole([FromBody] UserRoleRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -91,7 +91,7 @@ namespace WebService.Controllers
         // public async Task<ActionResult> ChangeUserRole([FromBody] UpdateUserRoleRequest request)
         // {
         //     var userId = GetUserIdFromCookie();
-        //     if (userId is null)
+        //     if (string.IsNullOrEmpty(userId))
         //     {
         //         return new UnauthorizedResult();
         //     }
@@ -104,7 +104,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> ResolveTicket(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }

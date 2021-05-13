@@ -29,7 +29,7 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<LedgerEntryResponse>>> GetLegerEntries(string start, string end)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -54,7 +54,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -71,7 +71,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> DeleteLedgerEntry(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -88,7 +88,7 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<IncomeGeneratorResponse>>> GetIncomeGenerators()
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -104,7 +104,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> AddIncomeGenerator([FromBody] IncomeGeneratorRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -133,7 +133,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> DeleteIncomeGenerator(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -166,7 +166,7 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<RecurringTransactionResponse>>> GetRecurringTransactions()
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -182,7 +182,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> AddRecurringTransaction([FromBody] RecurringTransactionRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
@@ -199,7 +199,7 @@ namespace WebService.Controllers
         public async Task<ActionResult> DeleteRecurringTransaction(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }

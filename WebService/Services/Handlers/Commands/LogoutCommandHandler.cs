@@ -22,7 +22,7 @@ namespace WebService
         public async Task<Unit> Handle(LogoutCommand command, CancellationToken cancellation)
         {
             var userId = _jwt.GetUserIdFromToken(command.Token.Jwt);
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 _logger.Throw($"Unable to retrieve user id from jwt {command.Token.Jwt}.");
             }
