@@ -29,7 +29,7 @@ namespace WebService.Controllers
             new OkObjectResult(await _mediatr.Send(new GetUserCountQuery()));
 
 
-        [HttpPost]
+        [HttpPut]
         [Route("login")]
         public async Task<ActionResult<LoginResponse>> LoginUser([FromBody] LoginRequest request)
         {
@@ -124,7 +124,7 @@ namespace WebService.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpDelete]
         [Route("logout")]
         [Authorize]
         public async Task<ActionResult> LogoutUser()
@@ -180,7 +180,7 @@ namespace WebService.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPatch]
         [Route("message")]
         public async Task<ActionResult> SubmitMessage([FromBody] MessageRequest request)
         {

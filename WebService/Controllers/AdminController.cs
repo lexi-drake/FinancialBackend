@@ -99,7 +99,7 @@ namespace WebService.Controllers
         //     return new OkResult();
         // }
 
-        [HttpPost]
+        [HttpPatch]
         [Route("ticket/{id}/resolve")]
         public async Task<ActionResult> ResolveTicket(string id)
         {
