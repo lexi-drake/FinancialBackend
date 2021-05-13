@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Serilog;
+using MediatR;
 
 namespace WebService
 {
@@ -40,6 +41,7 @@ namespace WebService
 
             services.AddMemoryCache();
             services.AddMvc().AddFluentValidation();
+            services.AddMediatR(typeof(Startup));
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
@@ -52,9 +54,6 @@ namespace WebService
             var issuer = Configuration["ISSUER"];
             var secret = Configuration["JWT_SECRET"];
             services.AddScoped<IJwtHelper>(s => new JwtHelper(secret, issuer, audience));
-            services.AddScoped<ILedgerService, LedgerService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IAdminService, AdminService>();
 
             services.AddScoped<ILedgerRepository>(s =>
                 new LedgerRepository(s.GetRequiredService<IMemoryCache>(), Configuration["MONGO_DB"], Configuration["LEDGER_DB"]));

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
+using MediatR;
 
 namespace WebService.Controllers
 {
@@ -13,26 +14,14 @@ namespace WebService.Controllers
     public class LedgerController : ControllerBase
     {
         private readonly ILogger _logger;
-        private ILedgerService _service;
+        private IMediator _mediatr;
         private IJwtHelper _jwt;
 
-        public LedgerController(ILogger logger, ILedgerService service, IJwtHelper jwt)
+        public LedgerController(ILogger logger, IMediator mediatr, IJwtHelper jwt)
         {
             _logger = logger;
-            _service = service;
+            _mediatr = mediatr;
             _jwt = jwt;
-        }
-
-        [HttpGet]
-        [Route("")]
-        public async Task<ActionResult<IEnumerable<LedgerEntryResponse>>> GetLegerEntries()
-        {
-            var userId = GetUserIdFromCookie();
-            if (userId is null)
-            {
-                return new UnauthorizedResult();
-            }
-            return new OkObjectResult(await _service.GetLedgerEntriesByUserIdAsync(userId));
         }
 
         [HttpGet]
@@ -40,30 +29,41 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<LedgerEntryResponse>>> GetLegerEntries(string start, string end)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-
-            var entries = await _service.GetLedgerEntriesBetweenDatesAsync(start, end, userId);
-            if (entries is null)
+            try
             {
-                // null is only returned if the dates aren't parsable
-                return new BadRequestResult();
+                var entries = await _mediatr.Send(new GetLedgerEntriesQuery()
+                {
+                    UserId = userId,
+                    Start = start,
+                    End = end
+                });
+                return new OkObjectResult(entries);
             }
-            return new OkObjectResult(entries);
+            catch (ArgumentException)
+            {
+                return new NotFoundResult();
+            }
         }
 
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<LedgerEntryResponse>> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
+        public async Task<ActionResult> InsertLedgerEntry([FromBody] LedgerEntryRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddLedgerEntryAsync(request, userId));
+            await _mediatr.Send(new AddLedgerEntryCommand()
+            {
+                UserId = userId,
+                Request = request
+            });
+            return new OkResult();
         }
 
         [HttpDelete]
@@ -71,11 +71,15 @@ namespace WebService.Controllers
         public async Task<ActionResult> DeleteLedgerEntry(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            await _service.DeleteLedgerEntryAsync(id, userId);
+            await _mediatr.Send(new DeleteLedgerEntryCommand()
+            {
+                UserId = userId,
+                Id = id
+            });
             return new OkResult();
         }
 
@@ -84,23 +88,44 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<IncomeGeneratorResponse>>> GetIncomeGenerators()
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.GetIncomeGeneratorsByUserIdAsync(userId));
+            var generators = await _mediatr.Send(new GetIncomeGeneratorsQuery()
+            {
+                UserId = userId
+            });
+            return new OkObjectResult(generators);
         }
 
         [HttpPost]
         [Route("generator")]
-        public async Task<ActionResult<IncomeGeneratorResponse>> AddIncomeGenerator([FromBody] IncomeGeneratorRequest request)
+        public async Task<ActionResult> AddIncomeGenerator([FromBody] IncomeGeneratorRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddIncomeGeneratorAsync(request, userId));
+
+            var transactionIds = new List<string>();
+            foreach (var transaction in request.RecurringTransactions)
+            {
+                transactionIds.Add(await _mediatr.Send(new AddRecurringTransactionQuery()
+                {
+                    UserId = userId,
+                    Request = transaction
+                }));
+            }
+
+            await _mediatr.Send(new AddIncomeGeneratorCommand()
+            {
+                UserId = userId,
+                Request = request,
+                TransactionIds = transactionIds
+            });
+            return new OkResult();
         }
 
         [HttpDelete]
@@ -108,12 +133,32 @@ namespace WebService.Controllers
         public async Task<ActionResult> DeleteIncomeGenerator(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            await _service.DeleteIncomeGeneratorAsync(id, userId);
-            return new OkResult();
+            try
+            {
+                var transactionIds = await _mediatr.Send(new DeleteIncomeGeneratorQuery()
+                {
+                    UserId = userId,
+                    Id = id
+                });
+                foreach (var transactionId in transactionIds)
+                {
+                    await _mediatr.Send(new DeleteRecurringTransactionCommand()
+                    {
+                        UserId = userId,
+                        Id = transactionId
+                    });
+                }
+
+                return new OkResult();
+            }
+            catch (ArgumentException)
+            {
+                return new NotFoundResult();
+            }
         }
 
         [HttpGet]
@@ -121,23 +166,32 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<RecurringTransactionResponse>>> GetRecurringTransactions()
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.GetRecurringTransactionsByUserIdAsync(userId));
+            var transactions = await _mediatr.Send(new GetRecurringTransactionsQuery()
+            {
+                UserId = userId
+            });
+            return new OkObjectResult(transactions);
         }
 
         [HttpPost]
         [Route("recurringtransaction")]
-        public async Task<ActionResult<RecurringTransactionResponse>> AddRecurringTransaction([FromBody] RecurringTransactionRequest request)
+        public async Task<ActionResult> AddRecurringTransaction([FromBody] RecurringTransactionRequest request)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            return new OkObjectResult(await _service.AddRecurringTransactionAsync(request, userId));
+            await _mediatr.Send(new AddRecurringTransactionQuery()
+            {
+                UserId = userId,
+                Request = request
+            });
+            return new OkResult();
         }
 
         [HttpDelete]
@@ -145,41 +199,34 @@ namespace WebService.Controllers
         public async Task<ActionResult> DeleteRecurringTransaction(string id)
         {
             var userId = GetUserIdFromCookie();
-            if (userId is null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return new UnauthorizedResult();
             }
-            await _service.DeleteRecurringTransactionAsync(id, userId);
+            await _mediatr.Send(new DeleteRecurringTransactionCommand()
+            {
+                UserId = userId,
+                Id = id
+            });
             return new OkResult();
         }
 
-        [HttpPost]
-        [Route("categories")]
-        public async Task<ActionResult<IEnumerable<LedgerEntryCategory>>> GetLedgerEntryCategories([FromBody] CategoryCompleteRequest request)
-        {
-            return new OkObjectResult(await _service.GetLedgerEntryCategoriesLikeAsync(request));
-        }
+        [HttpGet]
+        [Route("categories/{partial}")]
+        public async Task<ActionResult<IEnumerable<string>>> GetLedgerEntryCategories([FromBody] string partial) =>
+            new OkObjectResult(await _mediatr.Send(new GetCategoriesQuery() { Partial = partial }));
 
         [HttpGet]
         [Route("frequencies")]
-        public async Task<ActionResult<IEnumerable<Frequency>>> GetFrequencies()
-        {
-            return new OkObjectResult(await _service.GetAllAsync<Frequency>());
-        }
+        public async Task<ActionResult<IEnumerable<Frequency>>> GetFrequencies() => new OkObjectResult(await _mediatr.Send(new GetLedgerItemsQuery<Frequency>()));
 
         [HttpGet]
         [Route("salarytypes")]
-        public async Task<ActionResult<IEnumerable<SalaryType>>> GetSalaryTypes()
-        {
-            return new OkObjectResult(await _service.GetAllAsync<SalaryType>());
-        }
+        public async Task<ActionResult<IEnumerable<SalaryType>>> GetSalaryTypes() => new OkObjectResult(await _mediatr.Send(new GetLedgerItemsQuery<SalaryType>()));
 
         [HttpGet]
         [Route("transactiontypes")]
-        public async Task<ActionResult<IEnumerable<TransactionType>>> GetTransactionTypes()
-        {
-            return new OkObjectResult(await _service.GetAllAsync<TransactionType>());
-        }
+        public async Task<ActionResult<IEnumerable<TransactionType>>> GetTransactionTypes() => new OkObjectResult(await _mediatr.Send(new GetLedgerItemsQuery<TransactionType>()));
 
         private string GetUserIdFromCookie()
         {

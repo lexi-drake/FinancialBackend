@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using MediatR;
 
 namespace WebService.Controllers
 {
@@ -14,32 +15,37 @@ namespace WebService.Controllers
     {
         private static CookieOptions Options = new CookieOptions() { Secure = true, HttpOnly = true, SameSite = SameSiteMode.None, IsEssential = true };
         private readonly ILogger _logger;
-        private IUserService _service;
+        private IMediator _mediatr;
 
-        public UserController(ILogger logger, IUserService service)
+        public UserController(ILogger logger, IMediator mediatr)
         {
             _logger = logger;
-            _service = service;
+            _mediatr = mediatr;
         }
 
         [HttpGet]
         [Route("")]
-        public async Task<ActionResult<long>> GetUserCount()
-        {
-            return new OkObjectResult(await _service.GetUserCountAsync());
-        }
+        public async Task<ActionResult<long>> GetUserCount() =>
+            new OkObjectResult(await _mediatr.Send(new GetUserCountQuery()));
 
-        [HttpPost]
+
+        [HttpPut]
         [Route("login")]
         public async Task<ActionResult<LoginResponse>> LoginUser([FromBody] LoginRequest request)
         {
-            var loginResponse = await _service.LoginUserAsync(request);
-            if (loginResponse is null)
+            try
             {
-                return new NotFoundResult();
+                var loginResponse = await _mediatr.Send(new LoginQuery()
+                {
+                    Request = request
+                });
+                SetCookies(loginResponse.Token);
+                return new OkObjectResult(loginResponse);
             }
-            SetCookies(loginResponse.Token);
-            return new OkObjectResult(loginResponse);
+            catch (ArgumentException)
+            {
+                return new UnauthorizedResult();
+            }
         }
 
         [HttpGet]
@@ -49,13 +55,19 @@ namespace WebService.Controllers
         [Authorize]
         public async Task<ActionResult<LoginResponse>> CheckLoggedIn()
         {
-            var token = GetTokenFromCookie();
-            var loginResponse = await _service.GetUserAsync(token);
-            if (loginResponse is null)
+            try
             {
-                return new NotFoundResult();
+                var token = GetTokenFromCookie();
+                var loginResponse = await _mediatr.Send(new CheckLoginStatusQuery()
+                {
+                    Token = token
+                });
+                return new OkObjectResult(loginResponse);
             }
-            return new OkObjectResult(loginResponse);
+            catch (ArgumentException)
+            {
+                return new UnauthorizedResult();
+            }
         }
 
         [HttpGet]
@@ -65,63 +77,87 @@ namespace WebService.Controllers
         public async Task<ActionResult> RefreshToken()
         {
             var token = GetTokenFromCookie();
-            var newToken = await _service.RefreshLoginAsync(token);
-            if (newToken is null)
+            try
+            {
+                var newToken = await _mediatr.Send(new RefreshTokenQuery()
+                {
+                    Token = token
+                });
+                SetCookies(newToken);
+                return new OkResult();
+            }
+            catch (ArgumentException)
             {
                 return new UnauthorizedResult();
             }
-            SetCookies(newToken);
-            return new OkResult();
         }
 
         [HttpPost]
         [Route("create")]
         public async Task<ActionResult<LoginResponse>> CreateUser([FromBody] CreateUserRequest request)
         {
-            var loginResponse = await _service.CreateUserAsync(request);
-            if (loginResponse is null)
+            await _mediatr.Send(new CreateUserCommand()
             {
-                return new NotFoundResult();
+                Request = request
+            });
+
+            try
+            {
+                var loginResponse = await _mediatr.Send(new LoginQuery()
+                {
+                    Request = new LoginRequest()
+                    {
+                        Username = request.Username,
+                        Password = request.Password
+                    }
+                });
+                SetCookies(loginResponse.Token);
+                return new OkObjectResult(loginResponse);
             }
-            SetCookies(loginResponse.Token);
-            return new OkObjectResult(loginResponse);
+            catch (ArgumentException)
+            {
+                // Realistically, this should never be reached because it's
+                // using the same data that was just used to create the user
+                // to log that user in. If this hits, it's indicative of a more
+                // serious problem (or connectivity issues with the db).
+                return new UnauthorizedResult();
+            }
         }
 
-        [HttpGet]
+        [HttpDelete]
         [Route("logout")]
         [Authorize]
         public async Task<ActionResult> LogoutUser()
         {
             var token = GetTokenFromCookie();
-            ActionResult result = new OkResult();
             try
             {
-                // This throws an ArgumentException if the jwt is empty
-                await _service.LogoutUserAsync(token);
+                await _mediatr.Send(new LogoutCommand()
+                {
+                    Token = token
+                });
+                ClearCookies();
+                return new OkResult();
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                // Don't throw an exception here because we want to propogate the 
-                // error message to the front end instead of just sending a 500.
-                result = new UnauthorizedObjectResult(ex.Message);
+                return new UnauthorizedResult();
             }
-            ClearCookies();
-            return result;
         }
 
-        [HttpPost]
-        [Route("edit/username")]
-        [Authorize]
-        public async Task<ActionResult<UpdateUsernameResponse>> UpdateUsername([FromBody] UpdateUsernameRequest request)
-        {
-            var token = GetTokenFromCookie();
-            var response = await _service.UpdateUsernameAsync(request, token);
-            if (response is null)
-            {
-                return new NotFoundResult();
-            }
-            return new OkObjectResult(response);
-        }
+        // [HttpPost]
+        // [Route("edit/username")]
+        // [Authorize]
+        // public async Task<ActionResult<UpdateUsernameResponse>> UpdateUsername([FromBody] UpdateUsernameRequest request)
+        // {
+        //     var token = GetTokenFromCookie();
+        //     var response = await _service.UpdateUsernameAsync(request, token);
+        //     if (response is null)
+        //     {
+        //         return new NotFoundResult();
+        //     }
+        //     return new OkObjectResult(response);
+        // }
 
         [HttpPost]
         [Route("ticket")]
@@ -129,48 +165,58 @@ namespace WebService.Controllers
         public async Task<ActionResult> SubmitSupportTicket([FromBody] SupportTicketRequest request)
         {
             var token = GetTokenFromCookie();
-            ActionResult result = new OkResult();
             try
             {
-                await _service.SubmitSupportTicketAsync(request, token);
+                await _mediatr.Send(new AddSupportTicketCommand()
+                {
+                    Request = request,
+                    Token = token
+                });
+                return new OkResult();
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                result = new UnauthorizedObjectResult(ex.Message);
+                return new UnauthorizedResult();
             }
-            return result;
         }
 
-        [HttpPost]
+        [HttpPatch]
         [Route("message")]
-        [Authorize]
         public async Task<ActionResult> SubmitMessage([FromBody] MessageRequest request)
         {
             var token = GetTokenFromCookie();
-            ActionResult result = new OkResult();
             try
             {
-                await _service.AddMessageAsync(request, token);
+                await _mediatr.Send(new AddMessageCommand()
+                {
+                    Token = token,
+                    Request = request
+                });
+                return new OkResult();
             }
-            catch (ArgumentException ex)
-            {
-                result = new UnauthorizedObjectResult(ex.Message);
-            }
-            return result;
-        }
-
-        [HttpGet]
-        [Route("messages")]
-        [Authorize]
-        public async Task<ActionResult<IEnumerable<MessageResponse>>> GetMessages()
-        {
-            var token = GetTokenFromCookie();
-            var response = await _service.GetMessagesAsync(token);
-            if (response is null)
+            catch (ArgumentException)
             {
                 return new NotFoundResult();
             }
-            return new OkObjectResult(response);
+        }
+
+        [HttpGet]
+        [Route("tickets")]
+        public async Task<ActionResult<IEnumerable<SupportTicketResponse>>> GetTickets()
+        {
+            var token = GetTokenFromCookie();
+            try
+            {
+                var tickets = await _mediatr.Send(new GetMessagesQuery()
+                {
+                    Token = token
+                });
+                return tickets is null ? new NotFoundResult() : new OkObjectResult(tickets);
+            }
+            catch (ArgumentException)
+            {
+                return new NotFoundResult();
+            }
         }
 
         private void SetCookies(Token token)

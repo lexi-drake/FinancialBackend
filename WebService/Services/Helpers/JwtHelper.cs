@@ -73,13 +73,28 @@ namespace WebService
 
         public string GetUserIdFromToken(string jwt)
         {
-            return GetClaimByType(jwt, ClaimTypes.Name)?.Value;
+            try
+            {
+                return GetClaimByType(jwt, ClaimTypes.Name)?.Value;
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
         }
 
         public string GetRoleFromToken(string jwt)
         {
-            return GetClaimByType(jwt, ClaimTypes.Role)?.Value;
+            try
+            {
+                return GetClaimByType(jwt, ClaimTypes.Role)?.Value;
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
         }
+
 
         private Claim GetClaimByType(string jwt, string type)
         {
