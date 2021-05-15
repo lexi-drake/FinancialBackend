@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +43,9 @@ namespace WebService
             services.AddMemoryCache();
             services.AddMvc().AddFluentValidation();
             services.AddMediatR(typeof(Startup));
+            services.AddScoped<IRequestHandler<GetLedgerItemsQuery<Frequency>, IEnumerable<Frequency>>, GetLedgerItemsQueryHandler<Frequency>>();
+            services.AddScoped<IRequestHandler<GetLedgerItemsQuery<SalaryType>, IEnumerable<SalaryType>>, GetLedgerItemsQueryHandler<SalaryType>>();
+            services.AddScoped<IRequestHandler<GetLedgerItemsQuery<TransactionType>, IEnumerable<TransactionType>>, GetLedgerItemsQueryHandler<TransactionType>>();
 
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Information()

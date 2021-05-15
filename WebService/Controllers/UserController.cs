@@ -207,7 +207,7 @@ namespace WebService.Controllers
             var token = GetTokenFromCookie();
             try
             {
-                var tickets = await _mediatr.Send(new GetMessagesQuery()
+                var tickets = await _mediatr.Send(new GetTicketsQuery()
                 {
                     Token = token
                 });

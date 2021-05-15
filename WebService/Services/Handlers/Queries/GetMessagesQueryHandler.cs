@@ -8,20 +8,20 @@ using MediatR;
 
 namespace WebService
 {
-    public class GetMessagesQueryHandler : IRequestHandler<GetMessagesQuery, IEnumerable<SupportTicketResponse>>
+    public class GetTicketsQueryHandler : IRequestHandler<GetTicketsQuery, IEnumerable<SupportTicketResponse>>
     {
         private ILogger _logger;
         private IUserRepository _repo;
         private IJwtHelper _jwt;
 
-        public GetMessagesQueryHandler(ILogger logger, IUserRepository repo, IJwtHelper jwt)
+        public GetTicketsQueryHandler(ILogger logger, IUserRepository repo, IJwtHelper jwt)
         {
             _logger = logger;
             _repo = repo;
             _jwt = jwt;
         }
 
-        public async Task<IEnumerable<SupportTicketResponse>> Handle(GetMessagesQuery query, CancellationToken cancellation)
+        public async Task<IEnumerable<SupportTicketResponse>> Handle(GetTicketsQuery query, CancellationToken cancellation)
         {
             var role = _jwt.GetRoleFromToken(query.Token.Jwt);
             if (string.IsNullOrEmpty(role))

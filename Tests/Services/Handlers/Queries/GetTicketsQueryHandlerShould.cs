@@ -10,14 +10,14 @@ using WebService;
 
 namespace Tests
 {
-    public class GetMessagesQueryHandlerShould
+    public class GetTicketsQueryHandlerShould
     {
         private string _userId = Guid.NewGuid().ToString();
         private IJwtHelper _jwt = new JwtHelper(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
         private Mock<IUserRepository> _repo;
-        private GetMessagesQueryHandler _handler;
+        private GetTicketsQueryHandler _handler;
 
-        public GetMessagesQueryHandlerShould()
+        public GetTicketsQueryHandlerShould()
         {
             IEnumerable<SupportTicket> tickets = new List<SupportTicket>()
             {
@@ -32,7 +32,7 @@ namespace Tests
             _repo.Setup(x => x.GetSupportTicketsSubmittedByUser(_userId))
                 .Returns(Task.FromResult(from ticket in tickets where ticket.SubmittedById == _userId select ticket));
 
-            _handler = new GetMessagesQueryHandler(logger.Object, _repo.Object, _jwt);
+            _handler = new GetTicketsQueryHandler(logger.Object, _repo.Object, _jwt);
         }
 
         [Fact]
@@ -61,8 +61,8 @@ namespace Tests
 
         }
 
-        private GetMessagesQuery CreateValidQuery() =>
-            new GetMessagesQuery()
+        private GetTicketsQuery CreateValidQuery() =>
+            new GetTicketsQuery()
             {
                 Token = _jwt.CreateToken(_userId, "User")
             };
