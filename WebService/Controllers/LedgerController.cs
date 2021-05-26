@@ -213,7 +213,7 @@ namespace WebService.Controllers
 
         [HttpGet]
         [Route("categories/{partial}")]
-        public async Task<ActionResult<IEnumerable<string>>> GetLedgerEntryCategories([FromBody] string partial) =>
+        public async Task<ActionResult<IEnumerable<string>>> GetLedgerEntryCategories(string partial) =>
             new OkObjectResult(await _mediatr.Send(new GetCategoriesQuery() { Partial = partial }));
 
         [HttpGet]
