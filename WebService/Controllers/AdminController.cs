@@ -39,14 +39,6 @@ namespace WebService.Controllers
             });
 
         [HttpPost]
-        [Route("salarytype")]
-        public async Task<ActionResult> AddSalaryType([FromBody] SalaryTypeRequest request) =>
-            await AddLedgerItem(new SalaryType()
-            {
-                Description = request.Description
-            });
-
-        [HttpPost]
         [Route("transactiontype")]
         public async Task<ActionResult> AddTransactionType([FromBody] TransactionTypeRequest request) =>
             await AddLedgerItem(new TransactionType()

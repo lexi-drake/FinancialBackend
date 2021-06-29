@@ -44,7 +44,6 @@ namespace WebService
             services.AddMvc().AddFluentValidation();
             services.AddMediatR(typeof(Startup));
             services.AddScoped<IRequestHandler<GetLedgerItemsQuery<Frequency>, IEnumerable<Frequency>>, GetLedgerItemsQueryHandler<Frequency>>();
-            services.AddScoped<IRequestHandler<GetLedgerItemsQuery<SalaryType>, IEnumerable<SalaryType>>, GetLedgerItemsQueryHandler<SalaryType>>();
             services.AddScoped<IRequestHandler<GetLedgerItemsQuery<TransactionType>, IEnumerable<TransactionType>>, GetLedgerItemsQueryHandler<TransactionType>>();
 
             var logger = new LoggerConfiguration()
@@ -70,7 +69,6 @@ namespace WebService
             services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
             services.AddTransient<IValidator<RecurringTransactionRequest>, RecurringTransactionRequestValidator>();
             services.AddTransient<IValidator<FrequencyRequest>, FrequencyRequestValidator>();
-            services.AddTransient<IValidator<SalaryTypeRequest>, SalaryTypeRequestValidator>();
             services.AddTransient<IValidator<TransactionTypeRequest>, TransactionTypeRequestValidator>();
             services.AddTransient<IValidator<UserRoleRequest>, UserRoleRequestValidator>();
 

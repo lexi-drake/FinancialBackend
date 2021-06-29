@@ -27,7 +27,7 @@ namespace Tests
             var command = new AddLedgerItemCommand()
             {
                 UserId = Guid.NewGuid().ToString(),
-                LedgerItem = new SalaryType()
+                LedgerItem = new TransactionType()
                 {
                     Description = Guid.NewGuid().ToString()
                 }
@@ -35,7 +35,7 @@ namespace Tests
 
             await _handler.Handle(command, new CancellationToken());
 
-            _repo.Verify(x => x.InsertOneAsync<AbstractLedgerItem>(It.IsAny<SalaryType>()), Times.Once);
+            _repo.Verify(x => x.InsertOneAsync<AbstractLedgerItem>(It.IsAny<TransactionType>()), Times.Once);
         }
     }
 }

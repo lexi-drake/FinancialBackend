@@ -32,14 +32,11 @@ namespace Tests
                 TransactionTypeId = _validTransactionTypeId,
                 LastTriggered = DateTime.Now.AddDays(-(new Random().Next(1, 7)))
             };
-            IEnumerable<SalaryType> salaryTypes = new List<SalaryType>() { new SalaryType() { Id = _validSalaryTypeId } };
             IEnumerable<Frequency> frequencies = new List<Frequency>() { new Frequency() { Id = _validFrequencyId, ApproxTimesPerYear = _approxTimesPerYear } };
             IEnumerable<TransactionType> transactionTypes = new List<TransactionType>() { new TransactionType() { Id = _validTransactionTypeId } };
 
             var repository = new Mock<ILedgerRepository>();
             // Setup for IncomeGeneratorRequestValidator
-            repository.Setup(x => x.GetAllAsync<SalaryType>())
-                .Returns(Task.FromResult(salaryTypes));
             repository.Setup(x => x.GetAllAsync<Frequency>())
                 .Returns(Task.FromResult(frequencies));
 
@@ -74,28 +71,6 @@ namespace Tests
 
             var result = await _validator.ValidateAsync(request);
             AssertHelper.FailsWithMessage(result, "Description must not exceed 24 characters.");
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public async Task FailsForEmptySalaryTypeId(string id)
-        {
-            var request = CreateIncomeGeneratorRequest();
-            request.SalaryTypeId = id;
-
-            var result = await _validator.ValidateAsync(request);
-            AssertHelper.FailsWithMessage(result, "'Salary Type Id' must not be empty.");
-        }
-
-        [Fact]
-        public async Task FailsForInvalidSalaryTypeId()
-        {
-            var request = CreateIncomeGeneratorRequest();
-            request.SalaryTypeId = _invalidSalaryTypeId;
-
-            var result = await _validator.ValidateAsync(request);
-            AssertHelper.FailsWithMessage(result, "Salary Type Id must be valid.");
         }
 
         [Theory]
@@ -167,7 +142,6 @@ namespace Tests
             new IncomeGeneratorRequest()
             {
                 Description = Guid.NewGuid().ToString().Substring(0, 24),
-                SalaryTypeId = _validSalaryTypeId,
                 FrequencyId = _validFrequencyId,
                 RecurringTransactions = new List<RecurringTransactionRequest>() { _validRecurringTransactionRequest }
             };

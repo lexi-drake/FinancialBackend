@@ -221,10 +221,6 @@ namespace WebService.Controllers
         public async Task<ActionResult<IEnumerable<Frequency>>> GetFrequencies() => new OkObjectResult(await _mediatr.Send(new GetLedgerItemsQuery<Frequency>()));
 
         [HttpGet]
-        [Route("salarytypes")]
-        public async Task<ActionResult<IEnumerable<SalaryType>>> GetSalaryTypes() => new OkObjectResult(await _mediatr.Send(new GetLedgerItemsQuery<SalaryType>()));
-
-        [HttpGet]
         [Route("transactiontypes")]
         public async Task<ActionResult<IEnumerable<TransactionType>>> GetTransactionTypes() => new OkObjectResult(await _mediatr.Send(new GetLedgerItemsQuery<TransactionType>()));
 

@@ -12,24 +12,24 @@ namespace Tests
     public class GetLedgerItemsQueryHandlerShould
     {
         private Mock<ILedgerRepository> _repo;
-        private GetLedgerItemsQueryHandler<SalaryType> _handler;
+        private GetLedgerItemsQueryHandler<TransactionType> _handler;
 
         public GetLedgerItemsQueryHandlerShould()
         {
-            IEnumerable<SalaryType> salaryTypes = new List<SalaryType>();
+            IEnumerable<TransactionType> salaryTypes = new List<TransactionType>();
 
             var logger = new Mock<ILogger>();
             _repo = new Mock<ILedgerRepository>();
-            _repo.Setup(x => x.GetAllAsync<SalaryType>())
+            _repo.Setup(x => x.GetAllAsync<TransactionType>())
                 .Returns(Task.FromResult(salaryTypes));
 
-            _handler = new GetLedgerItemsQueryHandler<SalaryType>(logger.Object, _repo.Object);
+            _handler = new GetLedgerItemsQueryHandler<TransactionType>(logger.Object, _repo.Object);
         }
 
         [Fact]
         public async Task GetsAll()
         {
-            var types = await _handler.Handle(new GetLedgerItemsQuery<SalaryType>(), new CancellationToken());
+            var types = await _handler.Handle(new GetLedgerItemsQuery<TransactionType>(), new CancellationToken());
             Assert.NotNull(types);
         }
     }
