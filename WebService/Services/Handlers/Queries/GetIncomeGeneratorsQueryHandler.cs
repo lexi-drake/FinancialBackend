@@ -29,7 +29,6 @@ namespace WebService
                             {
                                 Id = generator.Id,
                                 Description = generator.Description,
-                                SalaryTypeId = generator.SalaryTypeId,
                                 FrequencyId = generator.FrequencyId,
                                 RecurringTransactions = recurringTransactions.Compile(generator.RecurringTransactions, transactionTypes)
                             };

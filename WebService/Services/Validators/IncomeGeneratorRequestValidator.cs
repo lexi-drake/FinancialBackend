@@ -17,16 +17,6 @@ namespace WebService
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
                 .Must(description => description.Length <= MAX_DESCRIPTION_LENGTH).WithMessage($"Description must not exceed {MAX_DESCRIPTION_LENGTH} characters.");
-            RuleFor(x => x.SalaryTypeId)
-                .Cascade(CascadeMode.Stop)
-                .NotEmpty()
-                .MustAsync(async (id, cancellation) =>
-                {
-                    var salaryTypes = from type in await _repo.GetAllAsync<SalaryType>()
-                                      where type.Id == id
-                                      select type;
-                    return salaryTypes.Any();
-                }).WithMessage("Salary Type Id must be valid.");
             RuleFor(x => x.FrequencyId)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()

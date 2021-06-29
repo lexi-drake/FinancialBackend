@@ -25,7 +25,6 @@ namespace WebService
             {
                 UserId = command.UserId,
                 Description = command.Request.Description,
-                SalaryTypeId = command.Request.SalaryTypeId,
                 FrequencyId = command.Request.FrequencyId,
                 RecurringTransactions = command.TransactionIds,
                 CreatedDate = DateTime.Now
